@@ -1,0 +1,13 @@
+Package: cDock
+Type: Package
+Title: An implementation of consensus docking methods for early-stage drug discovery
+Version: 1.0.1
+Date: 2018-06-19
+Author: Huikun Zhang, Michael A. Newton
+Maintainer: Huikun Zhang <statmanwisc@gmail.com>
+Description: An implementation of consensus docking methods for early-stage drug discovery in R. It consists of
+          of two discrete mixture models: Multivariate Mixture Model(MMM) and Mean-Variance Mixture Model(MVM);
+          one continuous mixture model and R-value ranking scheme: Uniform-Pareto Mixture (UPM). Two standard performence
+          evaluation metrics, i.e., ROCAUC and Enrichment Factor, are provided as well. See Henderson and Newton (2016),
+          Ericksen et al. (2017) and Rpackage rvalue for more details.
+License: What license is it under?
