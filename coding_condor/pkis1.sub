@@ -1,0 +1,39 @@
+# Rsub1.sub
+# Specify the HTCondor Universe (vanilla is the default and is used
+#  for almost all jobs), the desired name of the HTCondor log file,
+#  and the desired name of the standard error file.  
+#  Wherever you see $(Cluster), HTCondor will insert the queue number
+#  assigned to this set of jobs at the time of submission.
+# target = 1
+universe = vanilla
+log = pkis1.log
+error = pkis1.err
+#
+# Specify your executable (single binary or a script that runs several
+#  commands), arguments, and a files for HTCondor to store standard
+#  output (or "screen output").
+#  $(Process) will be a integer number for each job, starting with "0"
+#  and increasing for the relevant number of jobs.
+executable = main.sh
+arguments = $(target) $(nclust)
+output = pkis1.out
+
+## requiements
+requirements = (OpSysMajorVer == 7)
+#
+# Specify that HTCondor should transfer files to and from the
+#  computer where each job runs. The last of these lines *would* be
+#  used if there were any other files needed for the executable to run.
+initialdir = $(target)
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files =../R.tar.gz,../condor.R,../imeasure3.R,../pkis1.RData
+#
+# Tell HTCondor what amount of compute resources
+#  each job will need on the computer where it runs.
+request_cpus = 1
+request_memory = 2GB
+request_disk = 500MB
+#
+# Tell HTCondor to run 1 instances of our job:
+queue target, nclust from joblist.txt
