@@ -1,9 +1,9 @@
 cvadlearn <-
 function(u, label, nset=16){
-  source("adlearn.R")
-  source("rocauc.R")
-  source("inbin.R")
-  library(pROC)
+ ## source("adlearn.R")
+ ## source("rocauc.R")
+ ## source("inbin.R")
+ ## library(pROC)
   
   m <- nrow(u) ## number of targets
   n <- ncol(u) ## number of compounds

@@ -1,8 +1,8 @@
 cpdrank <-
 function(newinh, A, u)
 {
-  source("thredec.R") ## load threhhold deciding function
-  source("inbin.R")
+  ##source("thredec.R") ## load threhhold deciding function
+  ##source("inbin.R")
 
   y <- inbin(u)$y
   
