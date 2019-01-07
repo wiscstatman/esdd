@@ -1,7 +1,7 @@
 adlearn <-
 function(u, label, nset=16){
-  library(glmnet)
-  source("adpstep.R")
+  ##library(glmnet)
+  ##source("adpstep.R")
   fit.cur <- glmnet(as.matrix(u), as.factor(label), family="multinomial", alpha=1, dfmax=20, type.multinomial="grouped")
   
   lambd <- fit.cur$lambda
