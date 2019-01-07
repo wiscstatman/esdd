@@ -1,5 +1,4 @@
-Imports:
-  glmnet
-  pROC
-  ROCR
-  caTools
+imports(glmnet)
+imports(pROC)
+imports(ROCR)
+imports(caTools)
