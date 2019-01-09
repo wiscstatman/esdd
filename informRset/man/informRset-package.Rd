@@ -1,24 +1,24 @@
-\name{iGen-package}
-\alias{iGen-package}
-\alias{iGen}
+\name{informRset-package}
+\alias{informRset-package}
+\alias{informRset}
 \docType{package}
 \title{
-\packageTitle{iGen}
+\packageTitle{informRset}
 }
 \description{
-\packageDescription{iGen}
+\packageDescription{informRset}
 }
 \details{
 
 The DESCRIPTION file:
-\packageDESCRIPTION{iGen}
-\packageIndices{iGen}
+\packageDESCRIPTION{informRset}
+\packageIndices{informRset}
 ~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
-\packageAuthor{iGen}
+\packageAuthor{informRset}
 
-Maintainer: \packageMaintainer{iGen}
+Maintainer: \packageMaintainer{informRset}
 }
 \references{
 ~~ Literature or other references for background information ~~

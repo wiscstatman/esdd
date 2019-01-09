@@ -1,79 +1,63 @@
-## idea
+codingMC <- function( data, nbig=1000, clusternumbers=c( 5, 10, 15, 20), lambda=5, isize=16 )
+ {
+ # Do a Monte Carlo search to score good informer compounds [coding selection]
 
-## for a putative gsk.set A = { j }, 
+ n <- ncol(data) # number of compounds
+ m <- nrow(data) # number of targets
 
-## 1. use available data on A^c to form clusters of targets
-##    find a possible coding   
-## 2. measure the quality of the gsk-set by homogeneity within
-##    clusters on the activities of non-gsk compounds
+ # threshold, by row 2 SD rule
 
-## y_ij = activity indicator u[i,j] > threshold
-## sum_{block in cluster} sum_{i,i' in block}  d_{i,i'}
-##
-## where d_{i,i'} = 1 -  sum_[ j in A^c ] [ y_ij * y_i'j ]/sum [ y_ij max y_i'j]
+ ss <- apply( data, 1, sd )
+ xb <- apply( data, 1, mean )
 
-# note that in summing over pairs within blocks there's more things to
-# sum (given number of clusters) in unbalanced compared to balanced blockings
-# and the distances will be small if 
+ y <- 1*(data > xb+2*ss )
+ ###
 
+ ## vectors to hold compound information 
+ Asum <- rep(0,n)
+ Anum <- rep(0,n)
 
-target <- 7  ## drop one out for CV example
-nclust <- 10  ## number of clusters...want reallyt to look over a range
+ # initiate MC search
+ a <- sample(1:n, size=isize ) # initial informer set
+ A <- rep(FALSE, n)
+ A[a] <- TRUE
+ im <- imeasure(A, y, nclust=clusternumbers[1] ) # score set
 
-data(pkis1)
+ Anum[a] <- 1
 
-y <- y[-target,] ## remove the first row for cross validation
-m <- nrow(y) ## number of targets
-n <- ncol(y) ## number of compounds
+ best <- vector( mode="list" )
+ best$A <- A
+ best$score <- im$sumd - lambda*length(im$mapping) 
+ best$clust <- im$cluster
+ best$map <- im$mapping
 
+ Asum[a] <- best$score
 
-specs <- list( nclust=nclust, isize=16, phi=5, nbig=100000 )
-
-## let's do a randomized search
-
-nbig <- specs$nbig 
-
-nc <- specs$nc  ## number of clusters
-isize <- specs$isize  ## informer set size
-phi <- specs$phi  ## penalty for extrapolation
-
-Asum <- rep(0,n)
-Anum <- rep(0,n)
-
-a <- sample(1:n, size=isize )
-A <- rep(FALSE, n)
-A[a] <- TRUE
-im <- imeasure(A, y, nclust=nc )
-
-Anum[a] <- 1
-
-best <- vector( mode="list" )
-
-best$A <- A
-best$score <- im$sumd - phi*length(im$mapping) 
-best$clust <- im$cluster
-best$map <- im$mapping
-
-Asum[a] <- best$score
-
-for( ii in 2:nbig )
-{
-  a <- sample(1:n, size=isize )
-  A <- rep(FALSE, n)
-  A[a] <- TRUE
+ ## Now do further MC searching...
+ for( nc in clusternumbers )
+  { 
+  print( paste("cluster size", nc ) ) 
+  for( ii in 2:nbig )
+   {
+    a <- sample(1:n, size=isize )
+    A <- rep(FALSE, n)
+    A[a] <- TRUE
   
-  im <- imeasure(A, y, nclust=nc )
-  score <- im$sumd - phi*length( im$mapping )  ## longer mapping's better
-  Asum[a] <- Asum[a] + score 
-  Anum[a] <- Anum[a] +1
+    im <- imeasure(A, y, nclust=nc )
+    score <- im$sumd - lambda*length( im$mapping )  ## longer mapping's better
+    Asum[a] <- Asum[a] + score 
+    Anum[a] <- Anum[a] +1
   
-  if( score < best$score )
-  {
-    best$score <- score
-    best$A <- A
-    best$clust <- im$cluster
-    best$map <- im$mapping
-  }
-  print(ii)
+    if( score < best$score )
+    {
+      best$score <- score
+      best$A <- A
+      best$clust <- im$cluster
+      best$map <- im$mapping
+    }
+   }
+ }
+
+ compoundscore <- Asum/Anum
+ return( list(compoundscore=compoundscore, best=best)  )
 }
-

@@ -8,26 +8,26 @@ imeasure <- function(A, y, nclust)
   # observed activity profiles readily into clusters]
   
   # it will be a function from informer-set activities into
-  # clusters [so based on atoms of the transformation]
+  # clusters [so based on codewords of the transformation]
   
   uu <- apply( y[,A], 1, paste, collapse="" )
-  uuu <- unique(uu)  ## the distinct atoms; functions can't 
-  ##distinguish individual atoms
-  natoms <- length(uuu)
+  uuu <- unique(uu)  ## the distinct codewords; functions can't 
+  ##distinguish individual codewords
+  ncodewords <- length(uuu)
   
   # now make nclust by merging these...[get a random partition]
   
-  if(natoms < nclust)
+  if(ncodewords < nclust)
   {
-    hh <- c(1:natoms)
+    hh <- c(1:ncodewords)
   }else{
     
-    ## random block atoms to form cluster
-    bpoint <- sample(c(2:natoms), size=nclust-1, replace=FALSE)
+    ## random block codewords to form cluster
+    bpoint <- sample(c(2:ncodewords), size=nclust-1, replace=FALSE)
     bpoint <- bpoint[order(bpoint)]
-    hh <- rep(1, natoms)
+    hh <- rep(1, ncodewords)
     
-    ## asign atoms to cluster
+    ## asign codewords to cluster
     for(ii in bpoint)
     {
       hh[-c(1:(ii-1))] <- hh[-c(1:(ii-1))] + 1
