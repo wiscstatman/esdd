@@ -2,10 +2,14 @@
 \alias{codingMC}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+function to deploy the coding selection method for informer based ranking 
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The method takes a targets by compounds chemogenomic matrix, and returns a 
+vector of scores (over compounds) for how useful the compounds are as members
+of an informer set. (Lower scores are better.)
+Such compounds will be tested experimentally against new
+compounds to enable predictions on non-informer compound bio-activity.
 }
 \usage{
 codingMC(data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), lambda = 5, isize = 16)
@@ -13,36 +17,38 @@ codingMC(data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), lambda = 5, isize
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{
-%%     ~~Describe \code{data} here~~
+ a targets by compounds matrix of bioactivity levels (e.g. percent inhibition)
 }
   \item{nbig}{
-%%     ~~Describe \code{nbig} here~~
+ size of the Monte Carlo search
 }
   \item{clusternumbers}{
-%%     ~~Describe \code{clusternumbers} here~~
+ entertained numbers of clusters in CS method
 }
   \item{lambda}{
-%%     ~~Describe \code{lambda} here~~
+penalty parameter
 }
   \item{isize}{
-%%     ~~Describe \code{isize} here~~
+size of the informer set
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+The code converts input data to binary records of bioactivity of each compound
+against each target.   It deploys a Monte Carlo search strategy, randomly 
+sampling informer sets and induced code-word partitions of the target space,
+and scores each with a penalized score indicating purity within clusters across
+non-informer compounds.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  \item{compoundscore}{A vector over compounds holding average marginal
+score.   Lowest scores constitute the methods informer set}}
+  \item{best}{The single best identified set, by joint analysis}
 }
 \references{
-%% ~put references to the literature/web site here ~
+Zhang et al, 2019
 }
 \author{
-%%  ~~who you are~~
+Michael A. Newton
 }
 \note{
 %%  ~~further notes~~
@@ -51,56 +57,18 @@ codingMC(data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), lambda = 5, isize
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+adlearn for informer set via the adaptive selection method
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function (data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), 
-    lambda = 5, isize = 16) 
-{
-    n <- ncol(data)
-    m <- nrow(data)
-    ss <- apply(data, 1, sd)
-    xb <- apply(data, 1, mean)
-    y <- 1 * (data > xb + 2 * ss)
-    Asum <- rep(0, n)
-    Anum <- rep(0, n)
-    a <- sample(1:n, size = isize)
-    A <- rep(FALSE, n)
-    A[a] <- TRUE
-    im <- imeasure(A, y, nclust = clusternumbers[1])
-    Anum[a] <- 1
-    best <- vector(mode = "list")
-    best$A <- A
-    best$score <- im$sumd - lambda * length(im$mapping)
-    best$clust <- im$cluster
-    best$map <- im$mapping
-    Asum[a] <- best$score
-    for (nc in clusternumbers) {
-        print(paste("cluster size", nc))
-        for (ii in 2:nbig) {
-            a <- sample(1:n, size = isize)
-            A <- rep(FALSE, n)
-            A[a] <- TRUE
-            im <- imeasure(A, y, nclust = nc)
-            score <- im$sumd - lambda * length(im$mapping)
-            Asum[a] <- Asum[a] + score
-            Anum[a] <- Anum[a] + 1
-            if (score < best$score) {
-                best$score <- score
-                best$A <- A
-                best$clust <- im$cluster
-                best$map <- im$mapping
-            }
-        }
-    }
-    compoundscore <- Asum/Anum
-    return(list(compoundscore = compoundscore, best = best))
-  }
+
+data(pkis1)
+target <- 7  ## drop one out for a cross validation example
+
+f <- codingMC(data=pkis1[-target,] , nbig=1000 )
+
+      ## In paper, we use condor and do `nbig=10^7`
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

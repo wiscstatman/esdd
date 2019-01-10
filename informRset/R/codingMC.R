@@ -36,7 +36,7 @@ codingMC <- function( data, nbig=1000, clusternumbers=c( 5, 10, 15, 20), lambda=
  ## Now do further MC searching...
  for( nc in clusternumbers )
   { 
-  print( paste("cluster size", nc ) ) 
+  print( paste("number of clusters", nc ) ) 
   for( ii in 2:nbig )
    {
     a <- sample(1:n, size=isize )
@@ -59,5 +59,6 @@ codingMC <- function( data, nbig=1000, clusternumbers=c( 5, 10, 15, 20), lambda=
  }
 
  compoundscore <- Asum/Anum
+ names(compoundscore) <- dimnames(data)[[2]]
  return( list(compoundscore=compoundscore, best=best)  )
 }
