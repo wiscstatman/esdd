@@ -12,7 +12,7 @@ Such compounds will be tested experimentally against new
 compounds to enable predictions on non-informer compound bio-activity.
 }
 \usage{
-codingMC(data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), lambda = 5, isize = 16)
+codingMC(data, nbig = 1000, clusternumbers = c(5, 10, 15, 20), lambda = 5, isize = 16, seed=123)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,6 +30,9 @@ penalty parameter
 }
   \item{isize}{
 size of the informer set
+}
+  \item{seed}{
+an integer for the set.seed function
 }
 }
 \details{
@@ -68,6 +71,10 @@ target <- 7  ## drop one out for a cross validation example
 f <- codingMC(data=pkis1[-target,] , nbig=1000 )
 
       ## In paper, we use condor and do `nbig=10^7`
+
+# top compounds
+iset <- names(  (sort(f$compoundscore))[1:16] )
+
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

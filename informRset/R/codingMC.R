@@ -1,6 +1,7 @@
-codingMC <- function( data, nbig=1000, clusternumbers=c( 5, 10, 15, 20), lambda=5, isize=16 )
+codingMC <- function( data, nbig=1000, clusternumbers=c( 5, 10, 15, 20), lambda=5, isize=16, seed=123 )
  {
  # Do a Monte Carlo search to score good informer compounds [coding selection]
+ set.seed(seed)
 
  n <- ncol(data) # number of compounds
  m <- nrow(data) # number of targets
