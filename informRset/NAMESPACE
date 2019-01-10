@@ -2,7 +2,7 @@ import(glmnet,pROC,ROCR,caTools)
 
 export(adlearn)
 export(adpstep)
-export(coding)
+export(codingMC)
 export(cpdrank)
 export(cvadlearn)
 export(enrichf)
