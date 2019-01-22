@@ -1,7 +1,7 @@
 adlearn <-
 function(u, label, nset=16){
-  ##library(glmnet)
-  ##source("adpstep.R")
+  require(glmnet)
+  # find initial informers as nset/2 compounds predictive of input clustering
   fit.cur <- glmnet(as.matrix(u), as.factor(label), family="multinomial", alpha=1, dfmax=20, type.multinomial="grouped")
   
   lambd <- fit.cur$lambda
@@ -17,7 +17,7 @@ function(u, label, nset=16){
     infor.og <- tmp_coeffs[[1]]@i[-1]
   }
   
-  ## adaptive step
+  ## build remaining informer set to predict non-informers adaptively
   infor.tmp <- infor.og
   while(length(infor.tmp) < nset)
   {
