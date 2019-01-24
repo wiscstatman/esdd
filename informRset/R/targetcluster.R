@@ -1,4 +1,4 @@
-targetcluster <- function(u, nclust=41, epsilon=0.02, seed=123)
+targetcluster <- function(u, nclust=41, epsilon=0.04, seed=123)
 {
   set.seed(seed)
   
@@ -17,7 +17,6 @@ targetcluster <- function(u, nclust=41, epsilon=0.02, seed=123)
   {
     print(ii)
     
-    ##u.kclu <- kmeans(t(u), ii, nstart=20)
     u.kclu <- kmeans(u, ii, nstart=20)
     
     ## assign within cluster distance
@@ -34,7 +33,7 @@ targetcluster <- function(u, nclust=41, epsilon=0.02, seed=123)
   nk<- 2
   
   ## choose number of clusters
-  while(abs(1-u.ss[nk]/ss[nk-1]) >  epsilon){
+  while(abs(1-u.ss[nk]/u.ss[nk-1]) >  epsilon){
     nk <- nk+1
   }
   
