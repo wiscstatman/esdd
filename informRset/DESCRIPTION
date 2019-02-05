@@ -1,8 +1,8 @@
 Package: informRset
 Type: Package
 Title: An implementation of informer set generation and compound ranking methods
-Version: 1.0.2
-Date: 2019-01-09
+Version: 1.0.3
+Date: 2019-02-05
 Author: Huikun Zhang, Michael A. Newton
 Maintainer: Michael Newton <wiscstatman@gmail.com>
 Description: An implementation of informer set generation and compound ranking methods in R
