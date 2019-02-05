@@ -13,7 +13,7 @@ targetcluster <- function(u, maxclust=41, epsilon=0.04, seed=123)
   ## define matrix to store clustring labels
   u.label <- matrix(NA, nrow=m, ncol=maxclust-1)
   
-  for( ii in 2:nk ) 
+  for( ii in 2:maxclust ) 
   {
     u.kclu <- kmeans(u, ii, nstart=20)
     
