@@ -1,22 +1,20 @@
-targetcluster <- function(u, nclust=41, epsilon=0.04, seed=123)
+targetcluster <- function(u, maxclust=41, epsilon=0.04, seed=123)
 {
   set.seed(seed)
   
   # define vector for storing clustering results 
-  u.ss <- numeric(nclust-1)
-  names(u.ss) <- c(2:nclust)
+  u.ss <- numeric(maxclust-1)
+  names(u.ss) <- c(2:maxclust)
 
 
   n <- ncol(u) # of compounds
   m <- nrow(u) # of targets
   
   ## define matrix to store clustring labels
-  u.label <- matrix(NA, nrow=m, ncol=nclust-1)
+  u.label <- matrix(NA, nrow=m, ncol=maxclust-1)
   
-  for(ii in 2:nclust)
+  for( ii in 2:nk ) 
   {
-    print(ii)
-    
     u.kclu <- kmeans(u, ii, nstart=20)
     
     ## assign within cluster distance
@@ -25,7 +23,6 @@ targetcluster <- function(u, nclust=41, epsilon=0.04, seed=123)
     
     ## assign clustering results/labels
     u.label[,ii-1] <- u.kclu$cluster
-    
   }
   
   
@@ -36,7 +33,6 @@ targetcluster <- function(u, nclust=41, epsilon=0.04, seed=123)
   while(abs(1-u.ss[nk]/u.ss[nk-1]) >  epsilon){
     nk <- nk+1
   }
-  
   
   return(list(label=u.label[,(nk-1)], withinss=u.ss[nk-1], K=nk))
 }

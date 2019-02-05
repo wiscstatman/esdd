@@ -8,12 +8,12 @@ function to do an initial clustering of targets [for Adaptive Selection]
 applies k-means on the rows of the initial data matrix
 }
 \usage{
-targetcluster(u, nclust=41, epsilon=0.04, seed=123 )
+targetcluster(u, maxclust=41, epsilon=0.04, seed=123 )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{u}{training matrix of inhibition rates, rows are targets, columns are compounds}
-  \item{nclust}{a maximal number of target clusters}
+  \item{maxclust}{a maximal number of target clusters}
   \item{epsilon}{a threshold to do with selecting number of clusters}
   \item{seed} input for set.seed
 }
@@ -21,7 +21,7 @@ targetcluster(u, nclust=41, epsilon=0.04, seed=123 )
 applies k-means on the protein targets for various numbers of clusters
 }
 \value{
-A list holding cluster results for various cluster sizes
+A list holding cluster labels and statistics for best number of clusters
 }
 \references{
 index of inform compounds

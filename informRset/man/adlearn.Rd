@@ -52,9 +52,10 @@ Huikun Zhang
 }
 \examples{
 data(pkis1)
-label <- sample(c(1:8), nrow(pkis1), replace=TRUE)
 
-inform.index <- adlearn(u=pkis1, label=label, nset=16)
+tc <- targetcluster(u=pkis1) ## initiate via kmeans
+
+inform.index <- adlearn(u=pkis1, label=tc$label, nset=16)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
