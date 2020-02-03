@@ -15,7 +15,7 @@ targetcluster(u, maxclust=41, epsilon=0.04, seed=123 )
   \item{u}{training matrix of inhibition rates, rows are targets, columns are compounds}
   \item{maxclust}{a maximal number of target clusters}
   \item{epsilon}{a threshold to do with selecting number of clusters}
-  \item{seed} input for set.seed
+  \item{seed}{input for set.seed}
 }
 \details{
 applies k-means on the protein targets for various numbers of clusters
