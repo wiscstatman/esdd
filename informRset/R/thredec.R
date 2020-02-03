@@ -1,7 +1,7 @@
 thredec <-
 function(u, informer, newinh)
 {
-  source("inbin.R")
+  ## source("inbin.R")
   thresh <- inbin(u)$thresh
   M1 <- glm(thresh ~ u[,informer], family="binomial")
   
