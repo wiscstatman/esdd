@@ -44,7 +44,7 @@ non-informer compounds.
 }
 \value{
   \item{compoundscore}{A vector over compounds holding average marginal
-score.   Lowest scores constitute the methods informer set}}
+score.   Lowest scores constitute the methods informer set}
   \item{best}{The single best identified set, by joint analysis}
 }
 \references{
