@@ -11,7 +11,7 @@ a random partition of the induced code words.
 }
 \usage{
 imeasure(A, y, nclust)
-}s
+}
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{A}{
@@ -23,7 +23,7 @@ binary matrix, targets by compounds, holding bioactivity calls
   \item{nclust}{
 number of clusters to be entertained on the target space
 }
-}i
+}
 \details{
 The code first randomly partitions the targets by blocking targets according
 to code-words induced by the input informer set.   Then it scores the resulting
