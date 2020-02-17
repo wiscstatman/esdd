@@ -15,7 +15,7 @@ targetcluster <- function(u, maxclust=41, epsilon=0.04, seed=123)
   
   for( ii in 2:maxclust ) 
   {
-    u.kclu <- kmeans(u, ii, nstart=20)
+    u.kclu <- kmeans(u, centers = ii, iter.max = 500, nstart=20)
     
     ## assign within cluster distance
     u.ss[ii-1] <- u.kclu$tot.withinss
