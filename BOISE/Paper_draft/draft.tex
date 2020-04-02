@@ -116,14 +116,15 @@ In the present work, we investigate a decision-theoretic formalism for construct
 We are given an $m \times n$ binary matrix $x_0$ containing bioactivity data measured on $m$ targets with index set $I = \{1,2,\cdots,m\}$, and $n$ compounds with index set $J=\{1,2,\cdots,n\}$.  Each entry $x_{ij}$ of $x_0$ is a summary of experiments, such as inhibition assays,
 of compound $j$ on target $i$. To be more specific, $x_{ij} = 1$ means compound $j$ is active on target $i$ while $x_{ij} = 0$ means inactive. Binary outcome is of more interest to us because our task is to determine and find certain compounds that are effective on the given target. It may worth to say that although our method is based on binary matrix, it can be applied to any continuous bioactivity matrices as we can always convert a continuous matrix into a binary matrix. For example, if $z$ is a continuous matrix, we can use a target-wise threshold criterion (Eq. \ref{eq:thresh}) to binarize $z$ based on sample mean and standard deviation of each row:
 
-\begin{equation}\label{eq:thresh}
+\begin{eqnarray}
+\label{eq:thresh}
 x_{ij} = \begin{cases}
 		1, &\text{ if }
 	      z_{ij} \geq \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}],\\
 		0 & \text{ if }
 	      z_{ij} < \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}].
 	\end{cases}
-\end{equation}
+\end{eqnarray}
 Throughout the paper we will use (Eq. \ref{eq:thresh}) to binarize target outcomes.  
 
 Now let $i^* \notin I$ index a new protein target of interest, on which we have no initial bioactivity data.   
