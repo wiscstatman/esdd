@@ -116,15 +116,14 @@ In the present work, we investigate a decision-theoretic formalism for construct
 We are given an $m \times n$ binary matrix $x_0$ containing bioactivity data measured on $m$ targets with index set $I = \{1,2,\cdots,m\}$, and $n$ compounds with index set $J=\{1,2,\cdots,n\}$.  Each entry $x_{ij}$ of $x_0$ is a summary of experiments, such as inhibition assays,
 of compound $j$ on target $i$. To be more specific, $x_{ij} = 1$ means compound $j$ is active on target $i$ while $x_{ij} = 0$ means inactive. Binary outcome is of more interest to us because our task is to determine and find certain compounds that are effective on the given target. It may worth to say that although our method is based on binary matrix, it can be applied to any continuous bioactivity matrices as we can always convert a continuous matrix into a binary matrix. For example, if $z$ is a continuous matrix, we can use a target-wise threshold criterion (Eq. \ref{eq:thresh}) to binarize $z$ based on sample mean and standard deviation of each row:
 
-\begin{eqnarray}
-\label{eq:thresh}
+\begin{equation}\label{eq:thresh}
 x_{ij} = \begin{cases}
 		1, &\text{ if }
 	      z_{ij} \geq \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}],\\
 		0 & \text{ if }
 	      z_{ij} < \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}].
 	\end{cases}
-\end{eqnarray}
+\end{equation}
 Throughout the paper we will use (Eq. \ref{eq:thresh}) to binarize target outcomes.  
 
 Now let $i^* \notin I$ index a new protein target of interest, on which we have no initial bioactivity data.   
@@ -565,7 +564,7 @@ here ${\rm EFbase} = 1$ corresponding to random guess, and ${\rm EF10}_{max}$ is
 Although ROCAUC is known to provide amplified scores, it is still a good fit to our problem, as the goal of informer set ranking methods is to rank the compounds and maximize the positive proportion in a fixed size top set. It is a ranking problem instead of a classification problem. Actually we are not asked to give any predictions. From this point of view, NEF10 (Enrichment Factor) is the best criteria, however, NEF10 is a measurement fixed at some ratio, say $10\%$ in ranked compounds. If we want to evaluate ranking methods under different ratios of top set, ROCAUC is a good choice to summarize this information. We will show that BOISE and Accelerated-BOISE are better than previous methods on both data sets under these metrics:
 
 \subsection{PKIS1 Data Set}
-PKIS1 data set is a public human kinase chemogenomics data set. After pre-processing as described in Zhang, Ericksen, and Lee {\em et al.} (2019), the PKIS1 contains the inhibition values obtained at 1.0 $\mu$M concentrations. There are $224$ rows and $366$ columns in PKIS1 data matrix, with each row represents an unique kinase target and each column corresponding to an unique compound. The inhibition values are continuous values, and we derive the binary kinase inhibition matrix by the target-wise 2SD criteria stated in~(\ref{eq:thresh}). Similar to the previous paper, we conduct the same prospective and retrospective analysis based on PKIS1 data set, and results are as following:
+PKIS1 data set is a public human kinase chemogenomics data set, originally downloaded from \url{https://www.ebi.ac.uk/chembldb/extra/PKIS/PKIS_screening_data.csv}. After pre-processing as described in Zhang, Ericksen, and Lee {\em et al.} (2019), the PKIS1 contains the inhibition values obtained at 1.0 $\mu$M concentrations. There are $224$ rows and $366$ columns in PKIS1 data matrix, with each row represents an unique kinase target and each column corresponding to an unique compound. The inhibition values are continuous values, and we derive the binary kinase inhibition matrix by the target-wise 2SD criteria stated in~(\ref{eq:thresh}). When a new kinase target enters the study, our goal is to rank the compounds in PKIS1 from most likely to be active to least likely to be active, with the help of a fixed length informer set $A$ of compounds that we can get the test result on this new kinase target. Similar to the previous paper, we conduct the same prospective and retrospective analysis based on PKIS1 data set, and results are as following:
 
 \subsubsection{Prospective Results}
 We apply BOISE and Accelerated-BOISE on three novel kinase targets not included in PKIS1 target sets. They are microbial targets and hence phylogenetically distant from most human protein kinase contained in PKIS1 data set. These three new targets are PknB (\textit{Mycobacterium tuberculosis} kinase), BGLF4 (\textit{Epstein-Barr virus} kinase) and ROP18 (\textit{Toxoplasma gondii} kinase). 
@@ -643,23 +642,54 @@ Same thing happens when we boost informer set size from $n_A = 8$ to $n_A = 16$.
 \includegraphics[width=5.0in]{pkis1_16_ROCAUC_AC.png}
 \end{figure}
 
-Moreover, there are some concerns about ROCAUC metric, saying that it will amplify the scores. To address these concerns, we include other well-known robust classification criteria like Matthews Correlation Coefficient (MCC) into our comparison. It turns out different criteria will do no harm to BOISE superiority. 
+Moreover, there are some concerns about ROCAUC metric, saying that it will amplify the scores. To address these concerns, we include other well-known classification criteria like Matthews Correlation Coefficient (MCC) and F1 Score into our comparison. It turns out different criteria will do no harm to BOISE superiority. 
 
 Recall that definition of MCC is:
 \begin{eqnarray}
 \label{eq:mcc}
 MCC = \frac{TP\times TN-FP\times FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
 \end{eqnarray}
-where TP, FP, TN, FN come from confusion matrix. MCC takes value in $[-1,1]$, with MCC of $0$ indicates a random guess. Notice that MCC is for binary classification and we are doing ranking for compounds, we will just choose the best split point for our ranked compounds. From Figure 5 below, Adaptive Selection (AS8) is the best method other than AC-BOISE and BOISE under MCC. After paired t-test previously mentioned, the mean difference between AS8 and AC-BOISE is $0.0401$ with p-value $=2.839\times 10^{-5}$; and  mean difference between AS8 and BOISE is $0.0436$ with p-value $=3.722\times 10^{-6}$:
+
+and definition of F1 Score is:
+\begin{eqnarray}
+\label{eq:F1}
+F1 = \frac{2TP}{2TP+FN+FP}
+\end{eqnarray}
+where TP, FP, TN, FN come from confusion matrix. MCC takes value in $[-1,1]$, with MCC of $0$ indicates a random guess; F1 Score takes value in $[0,1]$, with F1 Score of $0.5$ indicates a random guess. Notice that MCC and F1 Score are both for binary classification, yet we are doing ranking for compounds, we will just choose the best split point for our ranked compounds to calculate the classification criteria. 
+
+From Figure \ref{fig:mcc} below, Adaptive Selection (AS8) is the best method other than AC-BOISE and BOISE under MCC. After paired t-test previously mentioned, the mean difference between AS8 and AC-BOISE is $0.0401$ with p-value $=2.839\times 10^{-5}$; and  mean difference between AS8 and BOISE is $0.0436$ with p-value $=3.722\times 10^{-6}$:
 
 \begin{figure}[!ht]
-\caption{\label{fig:auc2} 
+\caption{\label{fig:mcc} 
 {\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by Matthews Correlation Coefficient (MCC).} Each method is evaluated through leave one target out cross validation of PKIS1 targets. MCC takes value in $[-1,1]$. MCC of $0$ indicates a random guess, and MCC of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
 \centering
 \includegraphics[width=5.0in]{pkis1_8_MCC.png}
 \end{figure}
 
+From Figure \ref{fig:F1} below, Adaptive Selection (AS8) is also the best method other than AC-BOISE and BOISE under F1 Score. After paired t-test previously mentioned, the mean difference between AS8 and AC-BOISE is $0.0433$ with p-value $=1.783\times 10^{-5}$; and  mean difference between AS8 and BOISE is $0.0480$ with p-value $=1.637\times 10^{-6}$:
+
+\begin{figure}[!ht]
+\caption{\label{fig:F1} 
+{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by F1 Score.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. F1 Score takes value in $[0,1]$. F1 Score of $0$ indicates a random guess, and F1 Score of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
+\centering
+\includegraphics[width=5.0in]{pkis1_8_F1.png}
+\end{figure}
+
 \subsection{GDSC Data Set}
+GDSC data set is a drug sensitivity data set in cancer study. The original data is downloaded from \url{ftp://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/current_release/GDSC1_fitted_dose_response_25Feb20.xlsx}. It contains sensitivity data of each pair between anti-cancer drugs and cancer cell lines. The data set has already been pre-processed, and we care about the Z-score between each drug and each cancer cell line, with Z-score $\leq -2$ meaning the cancer cell line is sensitive to the drug. In other words, GDSC data set can be binarized without using 2SD criteria. During data cleaning, we also drop drugs and cell lines with too many missing values and finally we end up with a $281\times 207$ GDSC data matrix, with each row as a cancer cell line and each column as an anti-cancer drug. Each entry of the data matrix is continuous sensitivity Z-score, and we derive the binary sensitive matrix by simple threshold $\mathbbm{1}(z_{ij}\leq -2)$. 
+
+Similar to PKIS1 data set, our goal is still to rank the anti-cancer drugs in GDSC when a new cancer cell line comes in, with help of a fixed length informer set $A$. As there is no new cancer cell line test data available currently, we only conduct leave-one-out retrospective cross validation on GDSC data set. Also, since Coding Selection (CS) method is too computational extensive and  performance of Coding Selection can be bounded by Adaptive Selection (AS) and Regression Selection (RS) from previous analysis, we choose not to include CS in our comparison on GDSC data set. 
+
+In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are still better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than BOISE and AC-BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between AC-BOISE16 and AS16 is $0.0352$ with p-value $= 2.908\times 10^{-6}$; the mean difference in ROCAUC between AC-BOISE16 and AS16 is $0.0682$ with p-value $<2.2\times 10^{-16}$. 
+
+\begin{figure}[!ht]
+\caption{\label{fig:gdsc} 
+{\bf Violin plot comparison of different methods under informer sizes $n_A =8$ and $n_A = 16$ on GDSC data set with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one out cross validation of GDSC cancer cell lines. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
+\centering
+\includegraphics[width=5.0in]{GDSC.png}
+\end{figure}
+
+
 
 \section{Discussion}
 
@@ -669,12 +699,15 @@ where TP, FP, TN, FN come from confusion matrix. MCC takes value in $[-1,1]$, wi
 two-stage finite decision problems ; section 12.3.1 in 
 Parmigiani and Inoue...connection to sequential clinical trials...
 
+The idea of BOISE comes from Bayes decision theory (Parmigiani and Inoue 2009) and adaptive clinical trial design (Berry 2006). In section 12.3 of Parmigiani and Inoue (2009), a general procedure is formalized to solve two-stage finite decision problems: The second stage decision problem should be solved first, assuming that action and outcome in previous stage are given. Then we can go back to first stage decision problem with the help of optimal action in second stage. If we formalize the multistage decision problem as a decision tree, as Parmigiani and Inoue did in their book, this procedure seems like a recursion from its leaves to its root. In BOISE, informer set selection is the first stage problem and top set selection (or ranking) is the second stage problem. Therefore, we first look for the optimal top set rule $T^*(A,x_A,x_0)$, assuming we know the first stage action $A$ and outcome $x_A$, and then we step back to find best informer set rule with optimal top set rule $T^*(A,x_A,x_0)$. 
+
+When we seek the best informer set rule in first stage problem, ideas of adaptive design are edifying. Berry (2006) has formalized an adaptive trial design idea based on Bayesian predictive distribution, and this idea finally develops into I-SPY 1 trial (Gomez {\em et al.} 2007, 2008) and I-SPY 2 trial (Barker {\em et al.} 2009). In these clinical trials, drugs (or therapies) will be sequentially evaluated based on their predictive distribution. Every time when new patients come into study, decisions are made to drop, graduate, or continue testing on certain drugs. Evaluating drugs based on predictive distribution is to calculate the loss of all possible outcomes in the future, then take the average with respect to their conditional probability given previous outcomes. In BOISE, this idea is used to find optimal informer set $A$, where we pretend we have the future test result on inform set $A$, that is $x_A$, and take the integral of future loss ${\rm PEL}_2(x_0,x_A,A)$, with respect to conditional distribution $p(x_A\,|\,x_0)$. An adaptive design idea is proved to be more effective than standard designs in clinical trials, and now is also shown to be promising in informer set selection problem. 
 %\singlespacing
 %\setlength\bibsep{0pt}
 %\bibliographystyle{my-style}
 %\bibliography{Placeholder}
 
-
+\clearpage
 \appendix 
 
 \section{Proofs}
