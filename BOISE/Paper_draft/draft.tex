@@ -1,12 +1,12 @@
 \documentclass[12pt]{article}
 
-\usepackage{amssymb,amsmath,amsfonts,bbm,eurosym,geometry,ulem,graphicx,caption,color,setspace,sectsty,comment,footmisc,caption,natbib,pdflscape,subfigure,array,hyperref}
-
-
+\usepackage{amssymb,amsmath,amsfonts,bbm,eurosym,geometry,ulem,graphicx,caption,color,setspace,sectsty,comment,footmisc,caption,natbib,pdflscape,subfigure,array}
 \usepackage{algorithm, algorithmicx}
 \usepackage{algpseudocode}
 \usepackage{float}
 \usepackage{appendix}
+\usepackage{xcolor}
+\usepackage{hyperref}
 
 \normalem
 
@@ -41,7 +41,7 @@
 \date{\today}
 \maketitle
 \begin{abstract}
-\noindent Placeholder\\
+In early stage drug discovery, there has been significant recent effort in developing compound prioritization methods for a new target from minimal data. One kind of such methods is informer based ranking (IBR) methods, which select an initial subset of compounds, so-called informer set, to be screened based on original data, and rank additional compounds for the new target based on this additional screening data and original data. However, the selection of informer set in previous methods is often heuristic, based on chemical diversity or randomized algorithms with no statistical guarantees. In this article, we  formalize the informer set ranking procedure as a two-stage decision problem and introduce a new method named as Bayes Optimal Informer SEt (BOISE) to select informer set as well as ranking the compounds against the new target. BOISE is a fully Bayesian procedure that selects informer set based on posterior expected loss and ranks compounds based on posterior expectation. It is guaranteed to be Bayes rule under proposed model and loss if computed exactly, and we propose a computationally efficient version of BOISE that achieves a balance between ranking performance and computation complexity. Both proposed methods and previous methods are applied on human kinase chemogenomics data set and anti-cancer drug sensitivity data set and evaluated under various ranking criteria. We demonstrate that proposed methods are significantly better than previous methods under all metrics. 
 \vspace{0in}\\
 \noindent\textbf{Keywords:} key1, key2, key3\\
 \vspace{0in}\\
@@ -60,29 +60,14 @@
 \doublespacing
 
 
-\section{Background} \label{sec:background}
-
-Zhang, Ericksen, and Lee {\em et al.} (2019) (hereafter, ZEL) introduced
-informer-based-ranking (IBR) strategies for computational
-guidance of drug-discovery experiments.  The context is 
-virtual screening (Sliwoski {\em et al.} 2014).   Briefly, a chemical screening facility receives 
-material representing a purified protein target, and is tasked with identifying drugs
-that may have some inhibitory effect on the bioactivity of the protein.  For example, ZEL report
-on drugs that affect certain protein kinases.
-The facility has specific biochemical assays that test for
-inhibitory effects of a given drug, and it has access to a very large library of different drug compounds, some small fraction of which are expected to have bioactivity
-against the new target.   
-Costs limit the number of compounds that may be screened experimentally.   The virtual screening task is to prioritize the drugs 
-in advance of experimental screening by some computations so as to
+\section{Introduction} \label{sec:introduction}
+Informer based ranking (IBR) strategies are a family of methods that arise from early-stage drug discovery (Zhang, Ericksen, and Lee {\em et al.} 2019). It is designed for computational guidance of drug-discovery experiments. The context is virtual screening (Sliwoski {\em et al.} 2014).  Briefly speaking, a chemical screening facility receives material representing a purified protein target, and is tasked with identifying drugs that may have some inhibitory effect on the bioactivity of the protein.  For example, Zhang, Ericksen, and Lee {\em et al.} (2019) report on drugs that affect certain protein kinases.
+The facility has specific biochemical assays that test for inhibitory effects of a given drug, and it has access to a very large library of different drug compounds, some small fraction of which are expected to have bioactivity against the new target.   
+Costs limit the number of compounds that may be screened experimentally.   The virtual screening task is to prioritize the drugs in advance of experimental screening by some computations so as to
 improve the hit rate of the experiments performed on the new target.
 
-Virtual screening may operate on different kinds of target and compound data, including
-possibly chemical structures or the results of experimental assays.   For example, when chemical structures are available
-it is possible to use sophisticated molecular docking programs that aim to find best fits between target and compound
-structures (e.g. cite papers, including our own consensus docking paper.)
-We focus on IBR strategies that have access to data on the bioactivity of many compounds
-against many targets, though possibly not any bioactivity data from 
-the new target on test. **note...no compound structure data is needed**  With these initial bioactivity data, IBR  
+Virtual screening may operate on different kinds of target and compound data, including possibly chemical structures or the results of experimental assays.   For example, when chemical structures are available it is possible to use sophisticated molecular docking programs that aim to find best fits between target and compound structures (e.g. Kitchen {\em et al.} 2004, Erickson {\em et al.} 2017)
+We focus on informer based ranking strategies that need no information on chemical structure, only rely on bioactivity data of many compounds against many targets, and not any bioactivity data from the new target on test.  With these initial bioactivity data,   informer based ranking method
 identifies a subset of compounds -- the {\em informer set} -- which
 represent a small fraction of the available compounds and which we
 will test experimentally for bioactivity against the new target.  Subsequently, we use the full set of data (initial data on other targets
@@ -97,34 +82,36 @@ obtaining intermediate data; the payoff is that further experiments
 will return truly active drug compounds at  a higher rate than
 if we had selected compounds to test by some other scheme.
 
-ZEL introduced several bioactivity-based IBR strategies and compared
+One common misunderstanding in informer based ranking method is that someone will tend to select the most frequent hitters in bioactivity matrix as the informer set. We come up with a simple counterexample in Appendix to show that informer set ranking problem is a more complicated problem. In short, most informative compounds are not those that are most likely to be active. Zhang, Erichsen and Lee {\em et al.} (2019) introduced several informer based ranking strategies and compared
 them empirically in data on protein kinases. Though differing in detail,
 the proposed strategies all partition the initial
 bioactivity data, producing  clusters of relatively similar targets; 
 then informer compounds are  those that are predictive of the cluster label of a target.  Among kinase targets, the proposed bioactivity-based strategies had better predictive
 performance than commonly used strategies based upon chemical
-structure.   Since effective IBR strategies leverage statistical
+structure.   Since effective informer based ranking strategies leverage statistical
 patterns in the initial bioactivity data, we reason that
 statistical modeling may provide a useful approach to deriving
 more effective IBR strategies than are currently available. 
-In the present work, we investigate a decision-theoretic formalism for constructing informer sets ***
 
-\section{Bayes Optimal Informer SEt (BOISE)}
+In this article, we formalize the informer set ranking procedure as a two-stage decision problem and introduce a new method named as Bayes Optimal Informer SEt (BOISE) to select informer set as well as ranking the compounds against the new target.  The proposed method is fully Bayesian and can be applied to other ranking problems where only limited information can be derived from an unknown new target. We show in our analysis that this method is guaranteed to be Bayes rule if computed exactly, and can be efficiently computed with an approximate version to achieves a balance between ranking performance and computation complexity.  The proposed methods are applied to human  kinase  chemogenomics  data  set PKIS1 and anti-cancer drug sensitivity data set GDSC1. We compare new methods with previous methods under different informer set sizes and different ranking metrics, such as NEF10, ROCAUC, MCC and F1. We demonstrate that new methods are significantly better than previous methods under these data sets and metrics.
+
+
+\section{Methodology}
 
 \subsection{Problem Set Up}
 
 We are given an $m \times n$ binary matrix $x_0$ containing bioactivity data measured on $m$ targets with index set $I = \{1,2,\cdots,m\}$, and $n$ compounds with index set $J=\{1,2,\cdots,n\}$.  Each entry $x_{ij}$ of $x_0$ is a summary of experiments, such as inhibition assays,
-of compound $j$ on target $i$. To be more specific, $x_{ij} = 1$ means compound $j$ is active on target $i$ while $x_{ij} = 0$ means inactive. Binary outcome is of more interest to us because our task is to determine and find certain compounds that are effective on the given target. It may worth to say that although our method is based on binary matrix, it can be applied to any continuous bioactivity matrices as we can always convert a continuous matrix into a binary matrix. For example, if $z$ is a continuous matrix, we can use a target-wise threshold criterion (Eq. \ref{eq:thresh}) to binarize $z$ based on sample mean and standard deviation of each row:
+of compound $j$ on target $i$. To be more specific, $x_{ij} = 1$ means compound $j$ is active on target $i$ while $x_{ij} = 0$ means inactive. Binary outcome is of more interest to us because our task is to rank all active compounds on a given target prioritized above the inactives. Although our method is based on binary matrix, it can be applied to any continuous bioactivity matrices as we can always convert a continuous matrix into a binary matrix. For example, if $z$ is a continuous matrix, we can use a target-wise threshold criterion (\ref{eq:thresh}) to binarize $z$ based on sample mean and standard deviation of each row:
 
-\begin{equation}\label{eq:thresh}
+\begin{eqnarray}\label{eq:thresh}
 x_{ij} = \begin{cases}
 		1, &\text{ if }
 	      z_{ij} \geq \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}],\\
 		0 & \text{ if }
 	      z_{ij} < \mbox{mean}[z_{i\cdot}] + 2 \times \mbox{s.d.}[z_{i\cdot}].
 	\end{cases}
-\end{equation}
-Throughout the paper we will use (Eq. \ref{eq:thresh}) to binarize target outcomes.  
+\end{eqnarray}
+2SD threshold (\ref{eq:thresh}) is widely used to binarize outcomes in biomedical science.  
 
 Now let $i^* \notin I$ index a new protein target of interest, on which we have no initial bioactivity data.   
 We are asked to find a so-called informer set $A \subset J$ using initial data $x_0$. The size of $A$ is a
@@ -147,7 +134,7 @@ We imagine that all the compounds $j$ in $T$ will be
 tested against new target $i^*$, and we seek this  {\em top set} $T$ to have as many
 active compounds as possible.
 
-In Zhang, Ericksen, and Lee {\em et al.} (2019), there are $3$ novel informer-based-ranking (IBR) methods: Regression Selection (RS), Coding Selection (CS), Adaptive Selection (AS), as well as $2$ baseline methods: Baseline Chemometric (BC) and Baseline Frequent-hitters (BF). In this paper, we will introduce a new IBR method named as Bayes Optimal Informer SEt (BOISE) that is uniformly better than all the methods mentioned above.
+In Zhang, Ericksen, and Lee {\em et al.} (2019), there are $3$ novel informer-based-ranking (IBR) methods: Regression Selection (RS), Coding Selection (CS), Adaptive Selection (AS), as well as $2$ baseline methods: Baseline Chemometric (BC) and Baseline Frequent-hitters (BF). In this paper, we will introduce a new IBR method named as Bayes Optimal Informer SEt (BOISE) that is optimal in the context of Bayes decision theory.
 
 \subsection{Statistical Model}
 
@@ -174,13 +161,13 @@ P(\,x_{ij}=1&\mid i\in c_k, \mathcal{C}\,)= \phi_{kj}.
 \end{align}
 
 \textbf{Note:} The reason we use notation $\mathcal{C}$ is that we consider clustering structure as a random process on all possible partitions of countable targets space. Dirichlet process mixture model (DPMM) is a classical method to handle this kind of clustering structures, and we are using a special case of DPMM called Chinese restaurant (CR) process based on some prior mass
-$m_0$ to make the posterior inference. There are two main advantages of using DPMM instead of traditional clustering methods like spectral clustering, hierarchical clustering and k-means: On the one hand, we don't need to specify the number of clusters $K$ beforehand, or manually cut the tree to get the clustering structure. All we need to set is a prior mass $m_0$ that describes our belief of divergence and all the rest is data-driven. Thus, DPMM is less subjective than other methods. On the other hand, DPMM is a non-parametric Bayesian clustering method and hence is compatible with our Bayesian framework. Also, since the sample size is not very large($\approx 200$ targets), number of targets falling in each cluster can be unbalanced, with some clusters containing more than $50$ targets while other clusters containing less than 5 targets. DPMM is well designed to address this unbalanced impact under Bayesian framework. We will come to details of DPMM later in Section $3$ computation. 
+$m_0$ to make the posterior inference. There are two main advantages of using DPMM instead of traditional clustering methods like spectral clustering, hierarchical clustering and k-means: On the one hand, we don't need to specify the number of clusters $K$ beforehand, or manually cut the tree to get the clustering structure. All we need to set is a prior mass $m_0$ that describes our belief of divergence and all the rest is data-driven. Thus, DPMM is less subjective than other methods. On the other hand, DPMM is a non-parametric Bayesian clustering method and hence is compatible with our Bayesian framework. Also, since the sample size is not very large($\approx 200$ targets), number of targets falling in each cluster can be unbalanced, with some clusters containing more than $50$ targets while other clusters containing less than 5 targets. DPMM is well designed to address this unbalanced impact under Bayesian framework. We will come to details of DPMM later in computation section. 
 
 
 
 \subsection{Decision Rule}
 
-We are faced with a two-stage decision problem: First, we need a rule to produce an informer set $A$ of size $n_A$ from $x_0$. Then we need to produce a top set $T$ of size $n_T$ based on initial data $x_0$, informer set $A$ and intermediate data $x_A$. Denote these decision rules as $A = A(x_0)$ and $T = T(A,x_A,x_0)$ to show their dependency. 
+We are faced with a two-stage decision problem: First, we need a rule to select an informer set $A$ of size $n_A$ from $x_0$. Then we need to select a top set $T$ of size $n_T$ based on initial data $x_0$, informer set $A$ and intermediate data $x_A$. Denote these decision rules as $A = A(x_0)$ and $T = T(A,x_A,x_0)$ to show their dependency. 
 
 Our ultimate goal is to maximize the proportion of active compounds in top set $T$ with regard to new target $i^*$, therefore it is nature to define our loss function on informer-set rule $A$ and top-set rule $T$ as:
 \begin{eqnarray}
@@ -225,7 +212,7 @@ We define a particular top set rule $T^*$ to select the top $n_T$ compounds with
 \label{eq:topset}
 T^*(A,x_A,x_0) = \left\{ j \in J: \; \sum_{k\in J} \mathbbm{1}(\hat \theta_{i^*k} > \hat \theta_{i^*j}) \leq n_T \right\}.
 \end{eqnarray}
-For the loss~(\ref{eq:loss}), it is known that $T^*$ minimizes the Bayes risk (Henderson, 2015, Proposition 2.3.1).
+For the loss~(\ref{eq:loss}), it is known that $T^*$ minimizes the Bayes risk (Henderson 2016).
 We utilize this finding to resolve one part of our compound-decision problem, obtaining:
 
 \begin{theorem}
@@ -454,6 +441,7 @@ Notice that in Algorithm \ref{Algo2}, the sample sizes of $\mathbb C$ and $\math
 Though potentially biased, greedy algorithm seems to be a good fit to our informer set optimization problem~(\ref{eq:boise}): The complicated definition of ${\rm PEL}_1(x_0,A)$ in~(\ref{eq:pel}) results in an implicit form of objective function, and the discrete nature of informer set $A$ rules out gradient based optimization methods. Also, Theorem $2$ shows that ${\rm PEL}_1(x_0,A)$ is non-decreasing in $A$ given $x_0$, and hence we can do no harm to our informer set when applying greedy algorithm on informer set selection. We come up with $2$ kinds of informer selection methods based on greedy algorithm: One is simply following the procedure in Algorithm \ref{Algo2} to get an estimation of ${\rm PEL}_1(x_0,A)$ and make the selection; the other is using the information gain defined by entropy to approximate the ${\rm PEL}_1$ loss of $A$ and select the best informer set. From empirical analysis, both methods are significantly better than previous informer based ranking methods in Zhang, Ericksen, and Lee {\em et al.} (2019), and the exact method is slightly better than approximate method while the approximate method is much faster than exact one. We will describe our methods in this section and show the empirical results later in section 4.
 
 The first method is a straightforward sequential selection. At first we evaluate ${\rm PEL}_1(x_0,A)$ for all $A=1,\cdots,n$ to select the best $A$ with least ${\rm PEL}_1$ loss. Then at each iteration we memorize all previous decisions $A$ and select one best element $j\in J\setminus A$ that minimizes ${\rm PEL}_1(A\cup \{j\})$. The procedure can be summarized as following Algorithm \ref{Algo3}:
+
 \begin{algorithm}
 \caption{Exact Informer Selection}\label{Algo3}
 \hspace*{\algorithmicindent} \textbf{Input:} Initial data $x_0$, size of informer set $n_A$, size of top set $n_T$.\\
@@ -497,7 +485,7 @@ The intuition for expression~(\ref{eq:Score}) is strongly connected with ID3 dec
 Since $H(c(i^*)\,|\,\mathcal{C},x_0)$ is a constant when $\mathcal{C}$ and $x_0$ are given, maximizing ${\rm MI}(x_0, A)$ in~(\ref{eq:ID3}) is equivalent to minimizing the inner integral of $\mathcal H(A)$ in~(\ref{eq:Score}). It may worth to say that our approximate informer selection method is different from ID3 decision tree: our goal is not to predict the class label of $i^*$, as our clustering assignment is a random process on partitions. What we really need is a less chaotic system that can benefit our top set rule $T^*(A,x_A,x_0)$ and reduce the final loss $L(A^*,T^*)$. However, for the sake of easy understanding, our approximate informer selection method can be regarded as an ID3 decision tree algorithm with the same split feature of each level and maximum depth $n_A$. Also, we use ID3 decision tree algorithm instead of C4.5 algorithm (Quinlan 1993) since each candidate split feature $j\in J$ has the same number of possible outcomes: $0$ and $1$, so there is no bias towards features with more outcomes. Our second informer selection method is summarized in Algorithm \ref{Algo4}:
 
 \begin{algorithm}
-\caption{Approximate Informer Selection}\label{Algo4}
+\caption{Accelerated Informer Selection}\label{Algo4}
 \hspace*{\algorithmicindent} \textbf{Input:} Initial data $x_0$, size of informer set $n_A$, size of top set $n_T$.\\
 \hspace*{\algorithmicindent} \textbf{Output:} Selected informer set of length $n_A$
 \begin{algorithmic}[1]
@@ -521,10 +509,8 @@ Since $H(c(i^*)\,|\,\mathcal{C},x_0)$ is a constant when $\mathcal{C}$ and $x_0$
 As mentioned in the beginning of this section, the major advantage of Algorithm \ref{Algo4} compared with Algorithm \ref{Algo3} is running time. In Algorithm \ref{Algo4} we bypass the computation of $\mathbb E\left(\theta_{ij}\,|\, x_0,x_A\right)$ and only use $p_k = P(i^*\in c_k\,|\, \mathcal C,x_0,x_A)$ to select informer set. This can improve our BOISE running time from days to hours while still maintaining similar performance. Therefore, we name it as "Accelerated-BOISE" in our empirical analysis. Also, although Accelerated-BOISE uses different informer selection method as BOISE does, they both share the same top set rule $T^*(A,x_A,x_0)$, which scores each $j\in J$ with their posterior expectation and choose the top $n_T$ as top set.  
 
 \subsection{Missing Data Imputation}
-Previous informer based ranking methods in Zhang, Ericksen, and Lee {\em et al.} (2019) are not compatible with missing values in original data. BOISE, however, as a Bayes decision framework, can naturally handle with missing values in original data $x_0$. We will briefly discuss about missing data imputation in this section. 
-
-There are two procedures in BOISE that require missing data imputation: we need imputed data to update cluster labels in DPMM clustering, and we need a complete $x_0$ to determine $a_{kj}$ and $b_{kj}$ in informer selection. Therefore, we have two different strategies for missing value imputation. For DPMM clustering, we impute all missing entries after a thorough update of labels, that is, after we update all cluster labels $c_i$ for $i=1,\cdots,m$, we re-sample the value of missing entries based on posterior distribution $H_{-i,c}(\phi) = P\left(\phi\,|\,G_0,\{x_j:j\neq i, c_j = c\} \right)$. When all the clustering assignment samples are drawn, we summarize how many times each missing entry is imputed as $1$, say $N_{ij}$, and impute $x_{ij}$ as $1$ if $N_{ij}$ is greater than some threshold, like $50\%$ of clustering sample size. Then we can proceed with this final imputed data. The procedure of missing data imputation is in Algorithm $5$:
-
+As a Bayesian computation procedure, BOISE is naturally compatible with missing data imputations while previous informer based ranking methods are only designed for complete data sets. We will briefly discuss about missing data imputation in this section. 
+There are two procedures in BOISE that require missing data imputation: we need imputed data to update cluster labels in DPMM clustering, and we need a complete $x_0$ to determine $a_{kj}$ and $b_{kj}$ in informer selection. Therefore, we have two different strategies for missing value imputation summarized in Algorithm \ref{Algo5}:
 \begin{algorithm}
 \caption{Missing data imputation}\label{Algo5}
 \begin{algorithmic}[1]
@@ -546,6 +532,8 @@ There are two procedures in BOISE that require missing data imputation: we need 
 \EndIf
 \end{algorithmic}
 \end{algorithm} 
+
+ For DPMM clustering, we impute all missing entries after a thorough update of labels, that is, after we update all cluster labels $c_i$ for $i=1,\cdots,m$, we re-sample the value of missing entries based on posterior distribution $H_{-i,c}(\phi) = P\left(\phi\,|\,G_0,\{x_j:j\neq i, c_j = c\} \right)$. When all the clustering assignment samples are drawn, we summarize how many times each missing entry is imputed as $1$, say $N_{ij}$, and impute $x_{ij}$ as $1$ if $N_{ij}$ is greater than some threshold, like $50\%$ of clustering sample size. Then we can proceed with this imputed complete data. 
 
 \section{Empirical Results}
 We compare BOISE and Accelerated-BOISE with previous methods on two data sets: One is PKIS1 data set, which is thoroughly analyzed in  Zhang, Ericksen, and Lee {\em et al.} (2019). The other is GDSC data set, which contains sensitivity data between cancer cell lines and anti-cancer drugs. Both data sets are matrices with continuous values and can be converted to binary matrices meaningfully. The metrics we mainly use to evaluate model performance are ROCAUC and NEF10, which are standard metrics in virtual screening publications and consistent with Zhang, Ericksen, and Lee {\em et al.} (2019). Some other  classification metrics like F1 score and Matthew's Correlation Coefficent (MCC) are also included in supplementary. 
@@ -571,7 +559,7 @@ We apply BOISE and Accelerated-BOISE on three novel kinase targets not included 
 
 The task for informer based ranking methods is to prioritize which PKIS1 compounds might be active on these three targets with the inhibition value obtained on an informer set of size $16$. These targets are already screened in advance, yet the screening data are held separately from all methods before informer selection. After selecting the informer compounds, screening data only for those selected informer compounds are provided to each method to rank the whole compound set. To evaluate the performance of different methods, all of the available PKIS1 compounds are tested, and different methods are compared with respect to numbers of hits recovered in their top $10\%$ of ranked compounds for all three targets. Based on the screening results, the active thresholds defined by 2SD criteria~(\ref{eq:thresh}) are: $13.4\%$ for PknB, $20.2\%$ for BGLF4 and $43.8\%$ for ROP18.
 
-However, these experimentally determined thresholds contain information from non-informer compounds and should be kept away from all methods. In order to binarize the inhibition values to get the intermediate data $x_A$ for BOISE and Accelerated-BOISE, we follow the same procedure as Coding Selection (CS) and Adaptive Selection (AS) did in Zhang, Ericksen, and Lee {\em et al.} (2019). That is, we focus on the sub-matrix of inhibition data $Z$ on informer compounds, say $Z_A$, and keep track of all the possible binary outcomes $x_l$ of each row of $Z_A$. For rows with same binary outcome $x_l$, we compute a centroid corresponding to this outcome, say $c_l$, then the binary outcome $x_A$ of new target with inhibition values $z_A$ is defined as:
+However, these experimentally determined thresholds contain information from non-informer compounds and should be kept away from all methods. In order to binarize the inhibition values to get the intermediate data $x_A$ for BOISE and Accelerated-BOISE, we focus on the sub-matrix of inhibition data $Z$ on informer compounds, say $Z_A$, and keep track of all the possible binary outcomes $x_l$ of each row of $Z_A$. For rows with same binary outcome $x_l$, we compute a centroid corresponding to this outcome, say $c_l$, then the binary outcome $x_A$ of new target with inhibition values $z_A$ is defined as:
 \begin{align}
     \label{eq:Code}
     \begin{split}
@@ -606,40 +594,24 @@ In Table 1, the total number of experimentally determined active compounds is in
 It can be shown that RS, CS or AS can be better than baseline methods ${\rm BF}_w$ on some targets, but fail to beat the baseline on others, however, BOISE and Accelerated-BOISE are consistently better than baseline and RS, AS and CS methods on all 3 new targets. It may worth to say that baseline method is performing pretty well on these three new targets for two reasons: One is that baselines are allowed to utilize chemical structure similarity information of compounds in ranking, while non-baseline methods are not allowed to use addition information except inhibition matrix. The other is, as stated earlier, these three targets are all microbial targets that are far away from targets in PKIS1 phylogenetically. Therefore, inhibition data in PKIS1 is less informative than chemical structure similarity on these three targets, and $(7,10,7)$ recovery seems to be the best informer based ranking methods can do with PKIS1 data set. We can see a more significant difference among baseline methods, RS/CS/AS methods, and (AC-)BOISE in a retrospective analysis still on PKIS1.
 
 \subsubsection{Retrospective Results}
-We conduct retrospective leave one out cross validation for each one of $224$ PKIS1 targets. For BOISE, we use the informer size $n_A = 8$ as it is quite computational intensive. For Accelerated-BOISE, both $n_A= 8$ and $n_A = 16$ are used to compare different methods. Results from $224$ separate experiments are summarized in both tables and graphs. 
+We conduct retrospective leave one out cross validation for each one of $224$ PKIS1 targets. For BOISE, we use the informer size $n_A = 8$ as it is quite computational intensive. For Accelerated-BOISE, both $n_A= 8$ and $n_A = 16$ are used to compare different methods. Results from $224$ separate experiments are summarized in violin plots. 
 
-When informer set size $n_A = 8$, Figure 1 summarize cross validation results with respect to NEF10 metric, and Figure 2 summarize the results for ROCAUC metric. The summary statistics are in Table 2. From the graphs we can see that BOISE and Accelerated-BOISE are both significantly better than other baseline and non-baseline methods, and BOISE performs similarly to Accelerated-BOISE. Although BOISE is still slightly better than Accelerated-BOISE overall, as it is optimal theoretically, their difference is not statically significant. 
+When informer set size $n_A = 8$, Figure \ref{fig:pkis8} summarize cross validation results with respect to NEF10 and ROCAUC metrics. From pairwise tests, we can see that BOISE and Accelerated-BOISE are both significantly better than other baseline and non-baseline methods, and BOISE performs similarly to Accelerated-BOISE. Although BOISE is still slightly better than Accelerated-BOISE overall, as it is optimal theoretically, their difference is not statically significant. 
+To be more specific, it can be seen from Figure \ref{fig:pkis8} that Adaptive Selection (AS8) is the best method other than (AC-)BOISE8 under NEF10 metric. From paired t-test between AS8 and (AC-)BOISE8, the mean difference between BOISE8 and AS8 is $0.0608$, with p-value $<2.2\times 10^{-16}$; the mean difference between AC-BOISE8 and AS8 is $0.0520$, with p-value $=6.466\times 10^{-14}$. Similarly, Coding Selection (CS8) is the best method other than (AC-)BOISE8 under ROCAUC. The mean difference between BOISE8 and CS8 is $0.0283$, with p-value $=3.73\times 10^{-6}$ and the mean difference between AC-BOISE8 and CS8 is $0.0258$, with p-value $=3.035\times 10^{-5}$.
 
-To make things more clear, it can be seen from Figure 1 below that Adaptive Selection (AS8) is the best method other than BOISE and Accelerated-BOISE under NEF10 metric. By conducting a paired t-test between AS and (AC-)BOISE, the mean difference between BOISE and AS is $0.0608$, with p-value $<2.2\times 10^{-16}$; the mean difference between AC-BOISE and AS is $0.0520$, with p-value $=6.466\times 10^{-14}$. As for BOISE and AC-BOISE, the difference is $0.0088$, with p-value $=0.1096$. 
 \begin{figure}[!ht]
-\caption{\label{fig:nef} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by NEF10.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. NEF10 is a measurement of active compounds enrichment in top $10\%$ ranked compounds, after normalization with regard to maximum theoretical enrichment that could be achieved at the 10\% threshold for the target of interest.The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
+\caption{\label{fig:pkis8} 
+{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. NEF10 is a measurement of active compounds enrichment in top $10\%$ ranked compounds, after normalization with regard to maximum theoretical enrichment that could be achieved at the 10\% threshold for the target of interest. NEF10 and ROCAUC of 0.5 indicates a random guess, and of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \centering
-\includegraphics[width=5.0in]{pkis1_8_NEF10_AC.png}
+\includegraphics[width=5.0in]{PKIS1_8_eval.png}
 \end{figure}
 
-Similarly, from Figure 2 below we can see that Coding Selection (CS8) is the best method other than BOISE and Accelerated-BOISE under ROCAUC metric. By similar paired t-test, the mean difference between BOISE and CS is $0.0283$, with p-value $=3.73\times 10^{-6}$; the mean difference between AC-BOISE and CS is $0.0258$, with p-value $=3.035\times 10^{-5}$, and the difference between BOISE and AC-BOISE is $0.0024$, with p-value $=0.4578$.
-
+Same thing happens when we boost informer set size from $n_A = 8$ to $16$. Since BOISE takes too much time for a leave-one-out cross validation under $n_A=16$, we can not afford it, instead we treat Accelerated-BOISE as a lower bound of BOISE performance as Figure \ref{fig:pkis8} tell us. Empirical results summarized in Figure \ref{fig:pkis16} show that AC-BOISE is still significantly better than previous methods: Under NEF10 metric, Adaptive Selection (AS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0415$ with p-value $=6.199\times 10^{-7}$;  Under ROCAUC metric, Regression Selection (RS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0294$ with p-value $=1.303\times 10^{-4}$. 
 \begin{figure}[!ht]
-\caption{\label{fig:auc} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by ROCAUC.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. ROCAUC of 0.5 indicates a random guess, and ROCAUC of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
+\caption{\label{fig:pkis16} 
+{\bf Violin plot comparison of different methods under informer size $n_A =16$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.}} 
 \centering
-\includegraphics[width=5.0in]{pkis1_8_ROCAUC_AC.png}
-\end{figure}
-
-Same thing happens when we boost informer set size from $n_A = 8$ to $n_A = 16$. Since BOISE takes too much time for a leave-one-out cross validation under $n_A=16$, we can not afford it, instead we treat Accelerated-BOISE as a lower bound of BOISE performance as Figure 1 and Figure 2 tell us. Empirical results show that AC-BOISE is still significantly better than previous methods: Under NEF10 metric, Adaptive Selection (AS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0415$ with p-value $=6.199\times 10^{-7}$;  Under ROCAUC metric, Regression Selection (RS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0294$ with p-value $=1.303\times 10^{-4}$. More detailed results are summarized in following Figure 3 and Figure 4:
-\begin{figure}[!ht]
-\caption{\label{fig:nef2} 
-{\bf Violin plot comparison of different methods under informer size $n_A =16$ with respect to compound ranking performance assessed by NEF10.}} 
-\centering
-\includegraphics[width=5.0in]{pkis1_16_NEF10_AC.png}
-\end{figure}
-
-\begin{figure}[!ht]
-\caption{\label{fig:auc2} 
-{\bf Violin plot comparison of different methods under informer size $n_A =16$ with respect to compound ranking performance assessed by ROCAUC.}} 
-\centering
-\includegraphics[width=5.0in]{pkis1_16_ROCAUC_AC.png}
+\includegraphics[width=5.0in]{PKIS1_16_eval.png}
 \end{figure}
 
 Moreover, there are some concerns about ROCAUC metric, saying that it will amplify the scores. To address these concerns, we include other well-known classification criteria like Matthews Correlation Coefficient (MCC) and F1 Score into our comparison. It turns out different criteria will do no harm to BOISE superiority. 
@@ -657,30 +629,23 @@ F1 = \frac{2TP}{2TP+FN+FP}
 \end{eqnarray}
 where TP, FP, TN, FN come from confusion matrix. MCC takes value in $[-1,1]$, with MCC of $0$ indicates a random guess; F1 Score takes value in $[0,1]$, with F1 Score of $0.5$ indicates a random guess. Notice that MCC and F1 Score are both for binary classification, yet we are doing ranking for compounds, we will just choose the best split point for our ranked compounds to calculate the classification criteria. 
 
-From Figure \ref{fig:mcc} below, Adaptive Selection (AS8) is the best method other than AC-BOISE and BOISE under MCC. After paired t-test previously mentioned, the mean difference between AS8 and AC-BOISE is $0.0401$ with p-value $=2.839\times 10^{-5}$; and  mean difference between AS8 and BOISE is $0.0436$ with p-value $=3.722\times 10^{-6}$:
 
 \begin{figure}[!ht]
 \caption{\label{fig:mcc} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by Matthews Correlation Coefficient (MCC).} Each method is evaluated through leave one target out cross validation of PKIS1 targets. MCC takes value in $[-1,1]$. MCC of $0$ indicates a random guess, and MCC of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
+{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to performance assessed by Matthews Correlation Coefficient (MCC) and F1 Score.} MCC takes value in $[-1,1]$ and F1 Score takes value in $[0,1]$. MCC of $0$ and F1 Score of $0.5$ indicate a random guess; MCC and F1 Score of 1.0 represent ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
 \centering
-\includegraphics[width=5.0in]{pkis1_8_MCC.png}
+\includegraphics[width=5.0in]{PKIS1_8_mccf1.png}
 \end{figure}
 
-From Figure \ref{fig:F1} below, Adaptive Selection (AS8) is also the best method other than AC-BOISE and BOISE under F1 Score. After paired t-test previously mentioned, the mean difference between AS8 and AC-BOISE is $0.0433$ with p-value $=1.783\times 10^{-5}$; and  mean difference between AS8 and BOISE is $0.0480$ with p-value $=1.637\times 10^{-6}$:
 
-\begin{figure}[!ht]
-\caption{\label{fig:F1} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by F1 Score.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. F1 Score takes value in $[0,1]$. F1 Score of $0$ indicates a random guess, and F1 Score of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
-\centering
-\includegraphics[width=5.0in]{pkis1_8_F1.png}
-\end{figure}
+Figure \ref{fig:mcc} shows that (AC)-BOISE are still best under these classification criteria: Adaptive Selection (AS8) is the best method other than (AC)-BOISE  under MCC and F1 Score. When caring about MCC, the mean difference between AS8 and BOISE8 is is $0.0436$ with p-value $=3.722\times 10^{-6}$; and  mean difference between AS8 and AC-BOISE8 is $0.0401$ with p-value $=2.839\times 10^{-5}$; When caring about F1 Score, the mean difference between AS8 and BOISE is $0.0480$ with p-value $=1.637\times 10^{-6}$; and  mean difference between AS8 and AC-BOISE is $0.0433$ with p-value $=1.783\times 10^{-5}$.
+
 
 \subsection{GDSC Data Set}
 GDSC data set is a drug sensitivity data set in cancer study. The original data is downloaded from \url{ftp://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/current_release/GDSC1_fitted_dose_response_25Feb20.xlsx}. It contains sensitivity data of each pair between anti-cancer drugs and cancer cell lines. The data set has already been pre-processed, and we care about the Z-score between each drug and each cancer cell line, with Z-score $\leq -2$ meaning the cancer cell line is sensitive to the drug. In other words, GDSC data set can be binarized without using 2SD criteria. During data cleaning, we also drop drugs and cell lines with too many missing values and finally we end up with a $281\times 207$ GDSC data matrix, with each row as a cancer cell line and each column as an anti-cancer drug. Each entry of the data matrix is continuous sensitivity Z-score, and we derive the binary sensitive matrix by simple threshold $\mathbbm{1}(z_{ij}\leq -2)$. 
 
 Similar to PKIS1 data set, our goal is still to rank the anti-cancer drugs in GDSC when a new cancer cell line comes in, with help of a fixed length informer set $A$. As there is no new cancer cell line test data available currently, we only conduct leave-one-out retrospective cross validation on GDSC data set. Also, since Coding Selection (CS) method is too computational extensive and  performance of Coding Selection can be bounded by Adaptive Selection (AS) and Regression Selection (RS) from previous analysis, we choose not to include CS in our comparison on GDSC data set. 
 
-In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are still better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than BOISE and AC-BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between AC-BOISE16 and AS16 is $0.0352$ with p-value $= 2.908\times 10^{-6}$; the mean difference in ROCAUC between AC-BOISE16 and AS16 is $0.0682$ with p-value $<2.2\times 10^{-16}$. 
 
 \begin{figure}[!ht]
 \caption{\label{fig:gdsc} 
@@ -689,6 +654,7 @@ In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are still better than 
 \includegraphics[width=5.0in]{GDSC.png}
 \end{figure}
 
+In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are still better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than BOISE and AC-BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between AC-BOISE16 and AS16 is $0.0352$ with p-value $= 2.908\times 10^{-6}$; the mean difference in ROCAUC between AC-BOISE16 and AS16 is $0.0682$ with p-value $<2.2\times 10^{-16}$. 
 
 
 \section{Discussion}
@@ -706,7 +672,8 @@ One important issue in BOISE computation is MCMC sampling from Dirichlet Process
 \includegraphics[width=5.0in]{DPMM_performance.png}
 \end{figure}
 
-From the ACF plots in Figure \ref{fig:mcmc}, Markov chains on PKIS1 and GDSC both mix well as there is tiny auto-correlation among consecutive samples. However, from left two plots of cluster numbers in each sample in Figure \ref{fig:mcmc}, Markov chain on PKIS1 seems to be more stable than it on GDSC, and we believe this is caused by the nature of the GDSC data set since the large volatility still remains when we run a longer MCMC or change the prior mass. The volatility also corresponds to the difference between performances of BOISE on PKIS1 and GDSC: Figures  \ref{fig:nef} to \ref{fig:auc2} and Figure \ref{fig:gdsc} show that overall BOISE perform better on PKIS1 data set than on GDSC. This difference between PKIS1 and GDSC seems to be caused by some overwhelming data points that can either be assigned to some existing clusters or form a new cluster. In the future, we may allow for multiple cluster assignments for a single data point instead of forcing it to stay in only one cluster, and there is a corresponding extension of Chinese Restaurant process, named as Indian Buffet process, that admits multiple labels in DPMM. 
+From the ACF plots in Figure \ref{fig:mcmc}, Markov chains on PKIS1 and GDSC both mix well as there is tiny auto-correlation among consecutive samples. However, from left two plots of cluster numbers in each sample in Figure \ref{fig:mcmc}, Markov chain on PKIS1 seems to be more stable than it on GDSC, and we believe this is caused by the nature of the GDSC data set since the large volatility still remains when we run a longer MCMC or change the prior mass. The volatility also corresponds to the difference between performances of BOISE on PKIS1 and GDSC: By comparing Figures  \ref{fig:pkis8}, \ref{fig:pkis16} with Figure \ref{fig:gdsc}, we can see that overall BOISE perform better on PKIS1 data set than on GDSC. This difference between PKIS1 and GDSC seems to be caused by some overwhelming data points that can either be assigned to some existing clusters or form a new cluster. In the future, we may allow for multiple cluster assignments for a single data point instead of forcing it to stay in only one cluster, and there is a corresponding extension of Chinese Restaurant process, named as Indian Buffet process (Griffiths and Ghahramani 2011), that admits multiple labels in DPMM. 
+
 %\singlespacing
 %\setlength\bibsep{0pt}
 %\bibliographystyle{my-style}
@@ -788,37 +755,34 @@ This implies ${\mbox {\rm PEL}}_1(A\cup\{k\})\leq {\mbox {\rm PEL}}_1(A)$, and t
 
 \subsection{Frequent hitters rule}
 
-**Peng inserts proof about this **
+There are some researchers feeling that informer set is simply the most frequent hitters in compounds. We now show that even under the simplest setting frequent hitters may still not be the best informer set. 
 
-\textbf{Proposition for new settings}
-
-Under our new settings:
+Under our model (\ref{eq:model}), if we eliminate clustering structure for simplicity, that is:
 \begin{eqnarray*}
-&x_{i,j}|\beta_j \sim_{ind} {\rm Bernoulli}(\beta_j);\\
-&\beta_j \sim_{i.i.d} {\rm Beta}(a,b)
+&x_{i,j}|\theta_j \sim_{ind} {\rm Bernoulli}(\theta_j);\\
+&\beta_j \sim_{i.i.d} {\rm Beta}(\alpha,\beta)
 \end{eqnarray*}
 
 Let $s_k = \sum_{i = 1}^n x_{ik}$ be column sums. We can assume that $s_1 \leq s_2 \leq~...~\leq s_m$.
-
-Since it's conjugate prior, we have the posterior distribution:
+The posterior distribution is:
 \begin{eqnarray*}
-\beta_j | x_0 \sim {\rm Beta}(a + s_j, b + n - s_j)
+\theta_j | x_0 \sim {\rm Beta}(\alpha + s_j, \beta + n - s_j)
 \end{eqnarray*}
 \begin{equation}
-\beta_j|x_0,x_A \sim \left\{
+\theta_j|x_0,x_A \sim \left\{
 \begin{aligned}
-&{\rm Beta}(a+s_j, b+n-s_j),{\rm if}~j\notin A,\\
-&{\rm Beta}(a+s_j+x_j^*, b+n+1-s_j-x_j^*),{\rm if}~j\in A,\\
+&{\rm Beta}(\alpha+s_j, \beta+n-s_j),{\rm if}~j\notin A,\\
+&{\rm Beta}(\alpha+s_j+x_j^*, \beta+n+1-s_j-x_j^*),{\rm if}~j\in A,\\
 \end{aligned}
 \right.
 \end{equation}
 
-and the posterior expectation:
+and the posterior expectation is:
 \begin{equation}
-E(\beta_j|x_0,x_A) = \left\{
+E(\theta_j|x_0,x_A) = \left\{
 \begin{aligned}
-&(a + s_j)/(a + b + n),{\rm if}~j\notin A,\\
-&(a + s_j + x_j^*)/(a + b + n +1),{\rm if}~j\in A,\\
+&(\alpha + s_j)/(\alpha + \beta + n),{\rm if}~j\notin A,\\
+&(\alpha + s_j + x_j^*)/(\alpha + \beta + n +1),{\rm if}~j\in A,\\
 \end{aligned}
 \right.
 \end{equation}
@@ -826,102 +790,73 @@ E(\beta_j|x_0,x_A) = \left\{
 We first prove a general proposition:
 
 \begin{proposition}
-Given $n_A$, $n_T$ and the setting above, if for different informer sets $A_1$ and $A_2$, for any $0-1$ sequence $\nu$, $\hat{T}(A_1, x_{A_1} = \nu) = \hat{T}(A_2,x_{A_2} = \nu) \equiv T$, i.e. Top set is constant w.r.t. any results of two different informer sets. Then ${\rm PEL}_1(x_0, A_1) = {\rm PEL}_1(x_0, A_2)$.
+Given $n_A$, $n_T$ and the setting above, if for different informer sets $A_1$ and $A_2$, for any $0-1$ sequence $\nu$, $T^*(A_1, x_{A_1} = \nu,x_0) = \hat{T}(A_2,x_{A_2} = \nu,x_0) \equiv T$, i.e. Top set is constant w.r.t. any results of two different informer sets. Then ${\rm PEL}_1(x_0, A_1) = {\rm PEL}_1(x_0, A_2)$.
 \end{proposition}
 
 \begin{proof}
-Let $\Omega = \{$All the 0-1 sequences of length $n_A \}$ be the sample space of $x_{A_1}$. Then $P(x_{A_1}|x_0)$ is a probability measure on $\Omega$. By applying Fubini theorem several times, we have: 
+Let $\Omega = \{$All the 0-1 sequences of length $n_A \}$ be the sample space of $x_{A_1}$. Then from Fubini we have: 
 \begin{align*}
-    n_A - {\rm PEL}_1(x_0, A_1) &= \int_\Omega P(x_{A_1} = s|x_0)\sum_{j\in T} E(\beta_j|x_0, x_{A_1} = s) ~{\rm d}s\\
-    &= \sum_{j\in T} \int_\Omega \int_{[0,1]} \beta_j \times \frac{P(\beta_j,x_0,x_{A_1}=s )}{P(x_0,x_{A_1} = s)}\times \frac{P(x_{A_1} = s, x_0)}{P(x_0)}~{\rm d}\beta_j~{\rm d}s\\
-    &= \sum_{j \in T} \int_{[0,1]}\int_\Omega \beta_j P(\beta_j, x_{A_1} = s|x_0) ~{\rm d}s~{\rm d}\beta_j\\
-    &= \sum_{j\in T}E(\beta_j|x_0)
+    n_A - {\rm PEL}_1(x_0, A_1) &= \int_\Omega P(x_{A_1} = s|x_0)\sum_{j\in T} E(\theta_j|x_0, x_{A_1} = s) ~{\rm d}s\\
+    &= \sum_{j\in T} \int_\Omega \int_{[0,1]} \theta_j \times \frac{P(\theta_j,x_0,x_{A_1}=s )}{P(x_0,x_{A_1} = s)}\times \frac{P(x_{A_1} = s, x_0)}{P(x_0)}~{\rm d}\theta_j~{\rm d}s\\
+    &= \sum_{j \in T} \int_{[0,1]}\int_\Omega \theta_j P(\theta_j, x_{A_1} = s|x_0) ~{\rm d}s~{\rm d}\theta_j\\
+    &= \sum_{j\in T}E(\theta_j|x_0)
 \end{align*}
 
-Since the value of ${\rm PEL}_1(x_0,A_1)$ has nothing to do with informer set $A_1$, ${\rm PEL}_1(x_0, A) \equiv Const.$ for any informer sets.
+Since the value of ${\rm PEL}_1(x_0,A_1)$ has nothing to do with informer set $A_1$, ${\rm PEL}_1(x_0, A) \equiv {\rm Constant}$ for any informer sets.
 \end{proof}
 
-Consider now there are no ties in $s_j$'s, we will show that ${\rm PEL}_1(x_0, A)$ is constant risk for any $A$.
+When there are no ties in $s_j$'s, we can show that ${\rm PEL}_1(x_0, A)$ is constant risk for any $A$ under this simple setting:
 
-Notice that when $s_1 < s_2 < s_3 <...<s_m$, we can rewrite them as $s_i + 1\leq s_{i+1}$.
-
-From inequalities 
+Since
 $$
-\frac{a+s_i}{a+b+n} < \frac{a+s_i+1}{a+b+n+1} \leq \frac{a+s_{i+1}}{a+b+n+1}
-$$
-
-and 
-$$
-\frac{a+s_i}{a+b+n} <
-\frac{a+s_i+1}{a+b+n+1} \leq \frac{a+s_{i+1}}{a+b+n}
-$$
-
-and 
-$$
-\frac{a+s_i+1}{a+b+n+1} < \frac{a+s_i+1}{a+b+n} \leq \frac{a+s_{i+1}}{a+b+n}
-$$
-
-We have:
-$$
-E(\beta_i|x_0, x_i^* = 0, x_k^* = 1) \geq
-E(\beta_k|x_0,x_i^* = 0, x_k^* = 1), {\rm for}~k < i;
+E(\theta_i|x_0, x_i^* = 0, x_k^* = 1) \geq
+E(\theta_k|x_0,x_i^* = 0, x_k^* = 1), {\rm for}~k < i;
 $$
 
 and
 $$
-E(\beta_i|x_0, x_j^*, x_k^* = 1) > E(\beta_k|x_0,x_j^* = 1, x_k^* = 1), {\rm for}~k < i, j \neq i,k.
+E(\theta_i|x_0, x_j^*, x_k^* = 1) > E(\theta_k|x_0,x_j^*, x_k^* = 1), {\rm for}~k < i, j \neq i,k.
 $$
 
-This means: When there is no ties, $E(\beta_i|x_0, x_A) \geq E(\beta_k|x_0, x_A)$ for any $k < i$ and $x_A$. Therefore, we will choose a constant Top set $T = \{m-n_T+1,~...,~m-1,~m\}$ w.r.t any informer set $A$ and any results of $x_A$. 
+This means: When there is no ties, $E(\beta_i|x_0, x_A) \geq E(\beta_k|x_0, x_A)$ for any $k < i$ and $x_A$. Therefore, we will choose a constant top set $T = \{m-n_T+1,~...,~m-1,~m\}$ w.r.t any informer set $A$ and any results of $x_A$. 
 
-From our previous Proposition, when there is no ties, Top set is constant w.r.t. any results of different informer sets, and hence ${\rm PEL}_1(x_0, A)\equiv Const.$ for any A. 
-
-\textbf{Here is an counter-example}
+From our previous Proposition, when there is no ties, Top set is constant w.r.t. any results of different informer sets, and hence ${\rm PEL}_1(x_0, A)$ is a constant for any A. 
 
 We now show that: when $n_A = 1$, $n_T = 2$, and $s_m > s_{m-1} = s_{m-2}$, $A^* = \{m-1\}$ is better than the Frequent Hitters Rule $\hat{A} = \{m\}$ in our framework.
 
 First calculate $P(x_A|x_0)$:
 \begin{align*}
-    P(x_A|x_0) &= \frac{\int_\beta P(x_A, x_0|\beta_1,...,\beta_m)P(\beta_1,...,\beta_m){\rm d}\beta}{P(x_0)}\\
-    &= \frac{\int_\beta P(x_A|\beta_1,...,\beta_m)P(x_0,\beta_1,...,\beta_m){\rm d}\beta}{P(x_0)}\\
-    &= \int_\beta P(x_A|\beta_1,...,\beta_m)P(\beta_1,...,\beta_m|x_0){\rm d}\beta\\
-    &= \int_{\beta_A} P(x_A|\beta_A)P(\beta_A|x_0){\rm d}\beta_A\\
-    &= \int_{\beta_A} \frac{\Gamma(a+b+n)}{\Gamma(a+s_A)\Gamma(b+n-s_A)}\beta_A^{x_A}(1 - \beta_A)^{1-x_A}\beta_A^{a+s_A - 1}(1-\beta_A)^{b+n-s_A-1}{\rm d}\beta_A\\
-    &= \frac{1}{a+b+n}\times\frac{\Gamma(a+s_A+x_A)\Gamma(b+n+1-x_A-s_A))}{\Gamma(a+s_A)\Gamma(b+n-s_A)}
+    P(x_A|x_0) 
+    &= \int_\Theta P(x_A|\theta_1,...,\theta_m)P(\theta_1,...,\theta_m|x_0){\rm d}\theta\\
+    &= \int_{\Theta_A} P(x_A|\theta_A)P(\theta_A|x_0){\rm d}\beta_A\\
+    &= \frac{1}{\alpha+\beta+n}\times\frac{\Gamma(\alpha+s_A+x_A)\Gamma(\beta+n+1-x_A-s_A))}{\Gamma(\alpha+s_A)\Gamma(\beta+n-s_A)}
 \end{align*}
 
 Next calculate ${\rm PEL}_1(x_0,A)$:
 
-Recall $\hat{A} = \{m\}$ and $A^* = \{m-1\}$. Notice that whenever $x_{\hat{A}} = 0~ {\rm or} ~1$, $\hat{T}^*(x_0,x_{\hat{A}}) = \{m-1,m\}$. 
+Recall $\hat{A} = \{m\}$ and $A^* = \{m-1\}$. Notice that whenever $x_{\hat{A}} = 0~ {\rm or} ~1$, $T^*(x_0,x_{\hat{A}},x_0) = \{m-1,m\}$. 
 
 \begin{align*}
-    n_T - {\rm PEL}_1(x_0, \hat{A}) &= P(x_m^* = 1|x_0)(E(\beta_m|x_0,x_m^* = 1) + E(\beta_{m-1}|x_0, x_m^* = 1)) +\\ &~~~~P(x_m^* = 0|x_0)(E(\beta_m|x_0,x_m^* = 0) + E(\beta_{m-1}|x_0, x_m^* = 0))\\
-    &= \frac{a+s_m}{a+b+n}\times (\frac{a+s_m+1}{a+b+n+1} + \frac{a+s_{m-1}}{a+b+n})+\\ &~~~~\frac{b+n-s_m}{a+b+n}\times(\frac{a+s_m}{a+b+n+1} + \frac{a+s_{m-1}}{a+b+n})\\
-    &= \frac{(a + s_m) + (a+s_{m-1})}{a+b+n}
+    n_T - {\rm PEL}_1(x_0, \hat{A}) &= P(x_m^* = 1|x_0)\left[E(\theta_m|x_0,x_m^* = 1) + E(\theta_{m-1}|x_0, x_m^* = 1)\right] +\\ &~~~~P(x_m^* = 0|x_0)\left[E(\theta_m|x_0,x_m^* = 0) + E(\theta_{m-1}|x_0, x_m^* = 0)\right]\\
+    &= \frac{(\alpha + s_m) + (\alpha+s_{m-1})}{\alpha+\beta+n}
 \end{align*}
 
-and when $x_{A^*} = 1$, $\hat{T}^*(x_0,x_{A^*}) = \{m-1,m\}$; When $x_{A^*} = 0$, since $$
-E(\beta_{m-1}|x_0,x_{m-1}^* = 0) < E(\beta_{m-2}|x_0,x_{m-1}^* = 0)<E(\beta_m|x_0,x_{m-1}^* = 0)
-$$ 
-
-we have $\hat{T}^*(x_0,x_{A^*}) = \{m,m-2\}$.
+When $x_{A^*} = 1$, $T^*(x_0,x_{A^*},x_0) = \{m-1,m\}$; When $x_{A^*} = 0$,
+we have $T^*(x_0,x_{A^*},x_0) = \{m,m-2\}$.
 
 \begin{align*}
-    n_T - {\rm PEL}_1(x_0, A^*) &= P(x_{m-1}^* = 1|x_0)(E(\beta_m|x_0,x_{m-1}^* = 1) + E(\beta_{m-1}|x_0, x_{m-1}^* = 1)) +\\ &~~~~P(x_{m-1}^* = 0|x_0)(E(\beta_m|x_0,x_{m-1}^* = 0) + E(\beta_{m-2}|x_0, x_{m-1}^* = 0))\\
-    &= \frac{a+s_{m-1}}{a+b+n}\times (\frac{a+s_{m-1}+1}{a+b+n+1} + \frac{a+s_m}{a+b+n})+\\ &~~~~\frac{b+n-s_{m-1}}{a+b+n}\times(\frac{a+s_{m-2}}{a+b+n} + \frac{a+s_m}{a+b+n})\\
-    &= \frac{a + s_m}{a+b+n} + \frac{a+s_{m-1}}{a+b+n}(\frac{a+s_{m-1}+ 1}{a+b+n+1} + \frac{b+n-s_{m-1}}{a+b+n})
+    n_T - {\rm PEL}_1(x_0, A^*) &= P(x_{m-1}^* = 1|x_0)\left[E(\theta_m|x_0,x_{m-1}^* = 1) + E(\theta_{m-1}|x_0, x_{m-1}^* = 1)\right] +\\ &~~~~P(x_{m-1}^* = 0|x_0)\left[E(\theta_m|x_0,x_{m-1}^* = 0) + E(\theta_{m-2}|x_0, x_{m-1}^* = 0)\right]\\
+    &= \frac{\alpha + s_m}{\alpha+\beta+n} + \frac{\alpha+s_{m-1}}{\alpha+\beta+n}(\frac{\alpha+s_{m-1}+ 1}{\alpha+\beta+n+1} + \frac{\beta+n-s_{m-1}}{\alpha+\beta+n})
 \end{align*}
 
 Since:
 $$
-\frac{a+s_{m-1}+1}{a+b+n+1} > \frac{a+s_{m-1}}{a+b+n}.
+\frac{\alpha+s_{m-1}+1}{\alpha+\beta+n+1} > \frac{\alpha+s_{m-1}}{\alpha+\beta+n}.
 $$
 
 We have 
 $n_T - {\rm PEL}_1(x_0, \hat{A}) <n_T - {\rm PEL}_1(x_0, A^*)$, 
-so $\hat{A}$ is not the Bayes Rule.
-
-\textbf{Intuition:} From analysis above, it seems like we should first choose the "Transition Part" as informer set instead of the "Most-possible Part". For example, if $n_A = 2$, $n_T = 10$, $s_1 \geq s2 \geq ~...~\geq s_m$ defined same as before, than we should choose $\{9, 10\}$, not $\{1, 2\}$.
+so $\hat{A}$ is not the Bayes rule.
 
 \onehalfspacing
 
@@ -947,27 +882,52 @@ so $\hat{A}$ is not the Bayes Rule.
 \section*{References}
 
 \begin{list}{}{}
-\item Berger, J.O. (1985). {\em Statistical decision theory and Bayesian analysis}. 2nd ed. Springer-Verlag, New York.
+\item Aldous, D. (1985), "Exchangeability and Related Topics," {\em \'{E}cole d'\'{E}t\'{e} de Probabilit\'{e}s de Saint-Flour XIII-1983}, Springer, Berlin, 1-198.
 
-\item Carpenter, B., Gelman, A., Hoffman, M.D., Lee, D., Goodrich, B., Betancourt, M., Brubaker, M., Guo, J., Li, P. and Riddell, A., 2017. Stan: A probabilistic programming language. {\em Journal of statistical software}, 76(1).
+\item Antoniak, C.E. (1974), "Mixtures of Dirichlet Processes with Applications to Bayesian Nonparametric Problems," {\em The Annals of Statistics}, 2(6), 1152-1174.
 
-\item Henderson, N. (2015). {\em Methods for Ranking and Selection in Large-Scale Inference.} PhD Thesis,
-University of Wisconsin, Madison.
+\item Barker, A.D., Sigman, C.C., Kelloff, G.J., Hylton, N.M., Berry, D.A., and Esserman, L.J. (2009), "I-SPY2: An Adaptive Breast Cancer Trial Design in the Setting of Neoadjuvant Chemotherapy", {\em Clinical Pharmacology} \& {\em Therapeutics}, 86(1), 97-100. 
 
-\item Li, H. and Hong, F., (2001). Cluster-Rasch models for microarray gene expression data. {\em Genome biology}, 2(8), pp.research0031-1.
+\item Berger, J.O. (1985), {\em Statistical decision theory and Bayesian analysis}. 2nd ed. Springer-Verlag, New York.
 
-\item Parmigiani, G. and Inoue, L. (2009). {\em Decision theory: principles and approaches} (Vol. 812). John Wiley \& Sons.
+\item Berry, D.A. (2006), "Bayesian Clinical Trials," {\em Nature Reviews Drug Discovery}, 5, 27-36.
 
-\item Reker, D and Schneider, G (2015). Active-learning 
-strategies in computer-assisted drug design. **
+\item Blackwell, D., and MacQueen, J.B. (1973), "Ferguson Distributions via P\'{o}lya Urn Schemes", {\em The Annals of Statistics}, 1, 353-355.
 
-\item Robert, C. (2007). {\em The Bayesian choice: from decision-theoretic foundations to computational implementation.} Springer Science \& Business Media.
+\item Carpenter, B., Gelman, A., Hoffman, M.D., Lee, D., Goodrich, B., Betancourt, M., Brubaker, M., Guo, J., Li, P. and Riddell, A. (2017), "Stan: A probabilistic programming language," {\em Journal of statistical software}, 76(1).
 
-\item Sliwoski, G., Kothiwale, S., Meiler, J. and Lowe, E.W. (2014). Computational methods in drug discovery. {\em Pharmacological reviews}, 66(1), pp.334-395.
+\item Ericksen, S.S., Wu, H., Zhang, H., Michael, L.A., Newton, M.A., Hoffmann, F.M., and Wildman, S.A. (2017), "Machine Learning Consensus Scoring Improves Performance Across Targets in Structure-Based Virtual Screening," {\em Journal of Chemical Information and Modeling}, 57(7), 1579-1590.
 
-\item  Zhang, H.,   Ericksen, S.S.,  Lee, C.,  Ananiev, G.E., Wlodarchak, N.,  Mitchell, J.C.,  Gitter, A.,  Wright, S.J., Hoffmann, F.M.,  Wildman, S.A., and 
-Newton, M.A. (2019). Predicting kinase inhibitors using bioactivity matrix derived informer sets.
-\verb+bioarXiv+
+\item Ferguson, T.S. (1983), "Bayesian Density Estimation by Mixtures of Normal Distributions," {\em Recent Advances in Statistics}, 24, 287-302.
+
+\item Ferguson, T.S. (1973), "A Bayesian Analysis of Some Nonparametric Problems," {\em The Annals of Statistics}, 1, 209-230.
+
+\item Griffiths, T.L., and Ghahramani, Z. (2011), "The Indian Buffet Process: An Introduction and Review," {\em Journal of Machine Learning Research}, 12, 1185-1224.
+
+\item Henderson, N.C., Newton, M.A. (2016), "Making the Cut: Improved Ranking and Selection for Large-scale Inference", {\em Journal of the Royal Statistical Methodology Series B}, 78(4), 781-804.
+
+\item Kitchen, D.B., Decornez, H., Furr, J.R., and  Bajorath J. (2004), "Docking and scoring in virtual screening for drug discovery: methods and applications," {\em Nature Reviews Drug Discovery}, 3(11), 935-949.
+
+\item Li, H. and Hong, F., (2001), "Cluster-Rasch models for microarray gene expression data," {\em Genome biology}, 2(8), research0031-1.
+
+\item Neal, R.M. (2000), "Markov Chain Sampling Methods for Dirichlet Process Mixture Models," {\em Journal of Computational and Graphical Statistics}, 9, 249-265.
+
+\item Parmigiani, G. and Inoue, L. (2009), {\em Decision theory: principles and approaches} (Vol. 812), West Sussex, England: John Wiley \& Sons.
+
+\item Quinlan, J.R. (1986), "Induction of Decision Trees," {\em Machine Learning}, 1, 81-106.
+
+\item Quinlan, J.R. (1993), {\em C4.5: Programs for Machine Learning}, San Francisco, CA: Morgan Kaufmann Publishers Inc.
+
+\item Reker, D and Schneider, G (2015), "Active-learning 
+strategies in computer-assisted drug design," {\em Drug Discovery Today}, 20, 458-465.
+
+\item Robert, C. (2007), {\em The Bayesian choice: from decision-theoretic foundations to computational implementation.} Springer Science \& Business Media.
+
+\item Sliwoski, G., Kothiwale, S., Meiler, J., and Lowe, E.W. (2014), "Computational methods in drug discovery," {\em Pharmacological Reviews}, 66(1), pp.334-395.
+
+\item  Zhang, H.,   Ericksen, S.S.,  Lee, C.,  Ananiev, G.E., Wlodarchak, N., Yu, P., Mitchell, J.C.,  Gitter, A.,  Wright, S.J., Hoffmann, F.M.,  Wildman, S.A., and 
+Newton, M.A. (2019), "Predicting kinase inhibitors using bioactivity matrix derived informer sets," {\em PLoS Computational Biology}, 15(8): e1006813. 
+
 
 \end{list}
 
