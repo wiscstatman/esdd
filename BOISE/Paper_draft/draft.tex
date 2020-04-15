@@ -41,7 +41,7 @@
 \date{\today}
 \maketitle
 \begin{abstract}
-In early stage drug discovery, there has been significant recent effort in developing compound prioritization methods for a new target from minimal data. One kind of such methods is informer based ranking (IBR) methods, which select an initial subset of compounds, so-called informer set, to be screened based on original data, and rank additional compounds for the new target based on this additional screening data and original data. However, the selection of informer set in previous methods is often heuristic, based on chemical diversity or randomized algorithms with no statistical guarantees. In this article, we  formalize the informer set ranking procedure as a two-stage decision problem and introduce a new method named as Bayes Optimal Informer SEt (BOISE) to select informer set as well as ranking the compounds against the new target. BOISE is a fully Bayesian procedure that selects informer set based on posterior expected loss and ranks compounds based on posterior expectation. It is guaranteed to be Bayes rule under proposed model and loss if computed exactly, and we propose a computationally efficient version of BOISE that achieves a balance between ranking performance and computation complexity. Both proposed methods and previous methods are applied on human kinase chemogenomics data set and anti-cancer drug sensitivity data set and evaluated under various ranking criteria. We demonstrate that proposed methods are significantly better than previous methods under all metrics. 
+In early stage drug discovery, there has been significant recent effort in developing compound prioritization methods for a new target from minimal data. One kind of such methods is informer based ranking (IBR) methods, which selects an initial subset of compounds, so-called informer set, to be screened based on original data, and ranks additional compounds for the new target based on this additional screening data and original data. However, the selection of informer set in previous methods is often heuristic, based on chemical diversity or randomized algorithms with no statistical guarantees. In this article, we  formalize the informer set ranking procedure as a two-stage decision problem and introduce a new method named as Bayes Optimal Informer SEt (BOISE) to select informer set as well as rank the compounds against the new target. BOISE is a fully Bayesian procedure that selects informer set based on posterior expected loss and ranks compounds based on posterior expectation. It is guaranteed to be Bayes rule under proposed model and loss if computed exactly, and we propose a computationally efficient version of BOISE that achieves balance between ranking performance and computation complexity. Both proposed methods and previous methods are applied on human kinase chemogenomics data set and anti-cancer drug sensitivity data set and evaluated under various ranking criteria. We demonstrate that proposed methods are significantly better than previous methods under all metrics. 
 \vspace{0in}\\
 \noindent\textbf{Keywords:} key1, key2, key3\\
 \vspace{0in}\\
@@ -82,7 +82,7 @@ obtaining intermediate data; the payoff is that further experiments
 will return truly active drug compounds at  a higher rate than
 if we had selected compounds to test by some other scheme.
 
-One common misunderstanding in informer based ranking method is that someone will tend to select the most frequent hitters in bioactivity matrix as the informer set. We come up with a simple counterexample in Appendix to show that informer set ranking problem is a more complicated problem. In short, most informative compounds are not those that are most likely to be active. Zhang, Erichsen and Lee {\em et al.} (2019) introduced several informer based ranking strategies and compared
+One common misunderstanding of informer based ranking method is that many researchers tend to select the most frequent hitters in bioactivity matrix as the informer set. We come up with a simple counterexample in Appendix to show that informer set ranking problem is a more complicated problem. In short, most informative compounds are not those that are most likely to be active. Zhang, Ericksen and Lee {\em et al.} (2019) introduced several informer based ranking strategies and compared
 them empirically in data on protein kinases. Though differing in detail,
 the proposed strategies all partition the initial
 bioactivity data, producing  clusters of relatively similar targets; 
@@ -131,16 +131,15 @@ T = T\left( x_0, A, x_A \right) \subset J.
 The notation is intended to emphasize that the proposed top set $T$ is constructed
 from initial data, the informer set, and the intermediate data.
 We imagine that all the compounds $j$ in $T$ will be
-tested against new target $i^*$, and we seek this  {\em top set} $T$ to have as many
+tested against new target $i^*$, and we seek this  top set $T$ to have as many
 active compounds as possible.
 
 In Zhang, Ericksen, and Lee {\em et al.} (2019), there are $3$ novel informer-based-ranking (IBR) methods: Regression Selection (RS), Coding Selection (CS), Adaptive Selection (AS), as well as $2$ baseline methods: Baseline Chemometric (BC) and Baseline Frequent-hitters (BF). In this paper, we will introduce a new IBR method named as Bayes Optimal Informer SEt (BOISE) that is optimal in the context of Bayes decision theory.
 
 \subsection{Statistical Model}
 
-Our statistical model is a flexible generative model on both original known data $x_0$ and new unknown data $x_{i^*}$. 
+Our statistical model is a Bayesian model on both original known data $x_0$ and new target data $x_{i^*}$. 
 To represent similarity among targets, we assume there is a clustering structure $\mathcal{C}$ on targets $i\in I$, and targets within each cluster will have similar interactions with compounds. 
-
 To be more specific, we assume $\mathcal{C} = \{c_k, k = 1,2,\cdots\}$ is a partition on all $m$ targets. Each $c_k$ labels $m_k$ targets out of total $m$ targets. New target $i^*$ may be in one existing cluster $c_k$ or form a new cluster by itself, denoted as $c_0$. For each entry $x_{ij}$ of the bioactivity data $x_0$, we assume that it is a realization of mutually independent Bernoulli trails,  determined by both compound $j$ and the cluster $c_k$ where corresponding target $i$ belongs: 
 
 $$
@@ -600,18 +599,18 @@ When informer set size $n_A = 8$, Figure \ref{fig:pkis8} summarize cross validat
 To be more specific, it can be seen from Figure \ref{fig:pkis8} that Adaptive Selection (AS8) is the best method other than (AC-)BOISE8 under NEF10 metric. From paired t-test between AS8 and (AC-)BOISE8, the mean difference between BOISE8 and AS8 is $0.0608$, with p-value $<2.2\times 10^{-16}$; the mean difference between AC-BOISE8 and AS8 is $0.0520$, with p-value $=6.466\times 10^{-14}$. Similarly, Coding Selection (CS8) is the best method other than (AC-)BOISE8 under ROCAUC. The mean difference between BOISE8 and CS8 is $0.0283$, with p-value $=3.73\times 10^{-6}$ and the mean difference between AC-BOISE8 and CS8 is $0.0258$, with p-value $=3.035\times 10^{-5}$.
 
 \begin{figure}[!ht]
-\caption{\label{fig:pkis8} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. NEF10 is a measurement of active compounds enrichment in top $10\%$ ranked compounds, after normalization with regard to maximum theoretical enrichment that could be achieved at the 10\% threshold for the target of interest. NEF10 and ROCAUC of 0.5 indicates a random guess, and of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \centering
 \includegraphics[width=5.0in]{PKIS1_8_eval.png}
+\caption{\label{fig:pkis8} 
+{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one target out cross validation of PKIS1 targets. NEF10 is a measurement of active compounds enrichment in top $10\%$ ranked compounds, after normalization with regard to maximum theoretical enrichment that could be achieved at the 10\% threshold for the target of interest. NEF10 and ROCAUC of 0.5 indicates a random guess, and of 1.0 represents ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \end{figure}
 
 Same thing happens when we boost informer set size from $n_A = 8$ to $16$. Since BOISE takes too much time for a leave-one-out cross validation under $n_A=16$, we can not afford it, instead we treat Accelerated-BOISE as a lower bound of BOISE performance as Figure \ref{fig:pkis8} tell us. Empirical results summarized in Figure \ref{fig:pkis16} show that AC-BOISE is still significantly better than previous methods: Under NEF10 metric, Adaptive Selection (AS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0415$ with p-value $=6.199\times 10^{-7}$;  Under ROCAUC metric, Regression Selection (RS16) is the best method other than AC-BOISE and the paired t-test shows that their mean difference is $0.0294$ with p-value $=1.303\times 10^{-4}$. 
 \begin{figure}[!ht]
-\caption{\label{fig:pkis16} 
-{\bf Violin plot comparison of different methods under informer size $n_A =16$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.}} 
 \centering
 \includegraphics[width=5.0in]{PKIS1_16_eval.png}
+\caption{\label{fig:pkis16} 
+{\bf Violin plot comparison of different methods under informer size $n_A =16$ with respect to compound ranking performance assessed by NEF10 and ROCAUC.}}
 \end{figure}
 
 Moreover, there are some concerns about ROCAUC metric, saying that it will amplify the scores. To address these concerns, we include other well-known classification criteria like Matthews Correlation Coefficient (MCC) and F1 Score into our comparison. It turns out different criteria will do no harm to BOISE superiority. 
@@ -631,10 +630,10 @@ where TP, FP, TN, FN come from confusion matrix. MCC takes value in $[-1,1]$, wi
 
 
 \begin{figure}[!ht]
-\caption{\label{fig:mcc} 
-{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to performance assessed by Matthews Correlation Coefficient (MCC) and F1 Score.} MCC takes value in $[-1,1]$ and F1 Score takes value in $[0,1]$. MCC of $0$ and F1 Score of $0.5$ indicate a random guess; MCC and F1 Score of 1.0 represent ideal ranking with all active compounds prioritized above the inactives. The median and interquartile ranges are displayed as a white circle and black bars, respectively.} 
 \centering
 \includegraphics[width=5.0in]{PKIS1_8_mccf1.png}
+\caption{\label{fig:mcc} 
+{\bf Violin plot comparison of different methods under informer size $n_A =8$ with respect to performance assessed by Matthews Correlation Coefficient (MCC) and F1 Score.} }
 \end{figure}
 
 
@@ -648,10 +647,10 @@ Similar to PKIS1 data set, our goal is still to rank the anti-cancer drugs in GD
 
 
 \begin{figure}[!ht]
-\caption{\label{fig:gdsc} 
-{\bf Violin plot comparison of different methods under informer sizes $n_A =8$ and $n_A = 16$ on GDSC data set with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one out cross validation of GDSC cancer cell lines. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \centering
 \includegraphics[width=5.0in]{GDSC.png}
+\caption{\label{fig:gdsc} 
+{\bf Violin plot comparison of different methods under informer sizes $n_A =8$ and $n_A = 16$ on GDSC data set with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one out cross validation of GDSC cancer cell lines. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \end{figure}
 
 In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are still better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than BOISE and AC-BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between AC-BOISE16 and AS16 is $0.0352$ with p-value $= 2.908\times 10^{-6}$; the mean difference in ROCAUC between AC-BOISE16 and AS16 is $0.0682$ with p-value $<2.2\times 10^{-16}$. 
@@ -666,10 +665,10 @@ When we seek the best informer set rule in first stage problem, ideas of adaptiv
 One important issue in BOISE computation is MCMC sampling from Dirichlet Process. For conjugate models like in (\ref{eq:model}), we can collapse the computation by integrating parameters out and MCMC will mix well. One way to check for mixing properties of the Markov chain in DPMM is to check for the chain over numbers of clusters. Figure \ref{fig:mcmc} shows the plot and estimated auto-correlation of this chain over cluster numbers on PKIS1 and GDSC. 
 
 \begin{figure}[!ht]
-\caption{\label{fig:mcmc} 
-{\bf Mixing properties of MCMC sampling over clusters on PKIS1 and GDSC} The plots are based on the chain over numbers of clusters in each DPMM sample.}
 \centering
 \includegraphics[width=5.0in]{DPMM_performance.png}
+\caption{\label{fig:mcmc} 
+{\bf Mixing properties of MCMC sampling over clusters on PKIS1 and GDSC} The plots are based on the chain over numbers of clusters in each DPMM sample.}
 \end{figure}
 
 From the ACF plots in Figure \ref{fig:mcmc}, Markov chains on PKIS1 and GDSC both mix well as there is tiny auto-correlation among consecutive samples. However, from left two plots of cluster numbers in each sample in Figure \ref{fig:mcmc}, Markov chain on PKIS1 seems to be more stable than it on GDSC, and we believe this is caused by the nature of the GDSC data set since the large volatility still remains when we run a longer MCMC or change the prior mass. The volatility also corresponds to the difference between performances of BOISE on PKIS1 and GDSC: By comparing Figures  \ref{fig:pkis8}, \ref{fig:pkis16} with Figure \ref{fig:gdsc}, we can see that overall BOISE perform better on PKIS1 data set than on GDSC. This difference between PKIS1 and GDSC seems to be caused by some overwhelming data points that can either be assigned to some existing clusters or form a new cluster. In the future, we may allow for multiple cluster assignments for a single data point instead of forcing it to stay in only one cluster, and there is a corresponding extension of Chinese Restaurant process, named as Indian Buffet process (Griffiths and Ghahramani 2011), that admits multiple labels in DPMM. 
