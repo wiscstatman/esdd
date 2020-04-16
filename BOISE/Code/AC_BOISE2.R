@@ -35,5 +35,8 @@ AC_BOISE2 <- function(cl_sample, nA, train){
   return(inform)
 }
 
-# nA = 3
-# inform =  AC_BOISE2(cl_sample, nA, train) 
+# nA = 16
+# system.time({
+#   inform =  AC_BOISE2(cl_sample, nA, train)
+#   })
+# 12537
