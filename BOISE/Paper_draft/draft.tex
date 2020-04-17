@@ -692,30 +692,74 @@ such that  $r(A,T) \geq r(A, T^*)$. In other words, given $A$ and $x_A$, the bes
 \begin{align*}
 r(A, T) 
 &= \int_{x_0} \int_{x_A} \int_\Theta  L\left( A, T \right) \, 
-p(\theta, x_A,x_0)\, d\theta \, d x_A \, d x_0\\
+p(\theta, x_A,x_0)\, {\rm d}\theta \, {\rm d} x_A \, {\rm d} x_0\\
 &= \int_{x_0} \int_{x_A} \int_\Theta  L\left( A, T \right) \, 
-p(\theta |x_A,x_0)p(x_A|x_0)p(x_0)\, d\theta \, d x_A \, d x_0
+p(\theta |x_A,x_0)p(x_A|x_0)p(x_0)\, {\rm d}\theta \, {\rm d} x_A \, {\rm d} x_0
 \end{align*}
 To prove the Theorem, it is sufficient to show that for any possible fixed $x_A$, $x_0$, inequality 
 \begin{eqnarray}
 \label{eq:inequal1}
 \int_\Theta  L\left( A, T \right) \, 
-p(\theta |x_A,x_0) \, d\theta \geq \int_\Theta  L\left( A, T^* \right) \, 
-p(\theta |x_A,x_0) \, d\theta
+p(\theta |x_A,x_0) \, {\rm d}\theta \geq \int_\Theta  L\left( A, T^* \right) \, 
+p(\theta |x_A,x_0) \, {\rm d}\theta
 \end{eqnarray}holds, and this is obvious if we write loss function $L(A,T)$ explicitly:
 \begin{align*}
-\int_\Theta  L\left( A, T \right) \, p(\theta |x_A,x_0) \, d\theta &= \int_\Theta  ( n_T - \sum_{j\in T} \theta_{i^*j}) 
-p(\theta |x_A,x_0) \, d\theta\\
+\int_\Theta  L\left( A, T \right) \, p(\theta |x_A,x_0) \, {\rm d}\theta &= \int_\Theta  ( n_T - \sum_{j\in T} \theta_{i^*j}) 
+p(\theta |x_A,x_0) \, {\rm d}\theta\\
 &= n_T - \sum_{j\in T} \hat \theta_{i^*j}\\
 &\geq n_T - \sum_{j\in T^*}  \hat \theta_{i^*j}\\
 &= \int_\Theta  L\left( A, T^* \right) \, 
-p(\theta |x_A,x_0) \, d\theta
+p(\theta |x_A,x_0) \, {\rm d}\theta
 \end{align*}
 The equality comes from previous definition that $\hat \theta_{i^*j} = \mathbb E(\theta_{i^*j}|x_A,x_0)$.
 \end{proof}
 
 \subsection{Proof of Theorem 2}
-\begin{proof}
+We first prove a lemma that will be used in proof of Theorem 2:
+\begin{proposition}
+In BOISE model (\ref{eq:model}), if we use $x_A$ and $x_k$ to denote subsets of outcomes on the new target: $x_{i^*A}$ and $x_{i^*k}$, and $x_{0A}$ and $x_{0k}$ to denote subsets of outcomes on the original data set $x_0$, then we have:
+\begin{eqnarray}
+\label{condition_ind}
+x_A \indep x_k \, | \, x_0.
+\end{eqnarray}
+\end{proposition}
+
+\begin{proof}[Proof of Proposition 1]
+Notice that in model (\ref{eq:model}) we have:
+\begin{align}
+\label{condition_ind2}
+\begin{split}
+    (x_A,x_k) &\indep x_0 \, | \, (\theta_{i^*A},\theta_{i^*k});\\
+x_A &\indep x_k \,|\, (\theta_{i^*A},\theta_{i^*k});\\
+x_{0A} &\indep x_{0k} \,|\, (\theta_{i^*A},\theta_{i^*k});\\
+\theta_{i^*A} &\indep \theta_{i^*k};\\
+x_{0A} &\indep x_{0k}.
+\end{split}
+\end{align}
+From independence and conditional independence in (\ref{condition_ind2}), we can show that $\theta_{i^*A}\indep \theta_{i^*k}\, | \, x_0$ as following:
+
+\begin{align*}
+    p(\theta_{i^*A},\theta_{i^*k}\,|\,x_0)&=
+    \frac{p(x_0\,|\,\theta_{i^*A},\theta_{i^*k})p(\theta_{i^*A},\theta_{i^*k})}{p(x_0)}\\
+    &= \frac{p(x_{0A},x_{0k}\,|\,\theta_{i^*A},\theta_{i^*k})p(\theta_{i^*A},\theta_{i^*k})}{p(x_{0A},x_{0k})}\\
+    &= p(\theta_{i^*A}\,|\,x_{0A})p(\theta_{i^*k}\,|\,x_{0k})\\
+    &= p(\theta_{i^*A}\,|\,x_0)p(\theta_{i^*k}\,|\,x_0).
+\end{align*}
+
+Therefore, for desired $p(x_A,x_k\,|\,x_0)$ we have:
+\begin{align}
+\begin{split}
+    p(x_A,x_k\,|\,x_0) &= \int_\Theta p(x_A,x_k\,|\,\theta_{i^*A},\theta_{i^*k},x_0)p(\theta_{i^*A},\theta_{i^*k}\,|\,x_0) {\rm d}\theta_{i^*A}{\rm d}\theta_{i^*k}\\
+    &= \int_\Theta p(x_A\,|\,\theta_{i^*A})p(x_k\,|\,\theta_{i^*k})p(\theta_{i^*A}\,|\,x_0)p(\theta_{i^*k}\,|\,x_0){\rm d}\theta_{i^*A}{\rm d}\theta_{i^*k}\\
+    &= p(x_A\,|\,x_0)p(x_k\,|\,x_0).
+\end{split}
+\end{align}
+and this is equivalent to $x_A \indep x_k \, | \, x_0$.
+\end{proof}
+
+With the help of Proposition 1 we can now prove Theorem 2:
+
+\begin{proof}[Proof of Theorem 2]
 
 When $x_0$ is given, we can write ${\mbox {\rm PEL}}_1(x_0,A)$ as ${\mbox {\rm PEL}}_1(A)$ for simplicity. To prove Theorem $2$ we only need to show that, for any set $A \subset J$, and any $k\notin A$, ${\mbox {\rm PEL}}_1(A\cup\{k\})\leq {\mbox {\rm PEL}}_1(A)$.
 
@@ -723,26 +767,27 @@ For simplicity of notation, we denote top set rule as
 $T_1^*(x_A,x_k) = T^*(A\cup\{k\}, x_{A\cup\{k\}}, x_0)$ and $T_2^*(x_A) = T^*(A, x_{A}, x_0)$. Recall that:
 \begin{eqnarray*}
     {\mbox {\rm PEL}}_1(A\cup\{k\})= \int_{x_{A}}\int_{x_k} p\left( x_{A},x_k | x_0 \right) 
-\left[ \sum_{j \in  T_1^*(x_A,x_k)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]dx_A dx_k
+\left[ \sum_{j \in  T_1^*(x_A,x_k)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]{\rm d}x_A {\rm d}x_k
 \end{eqnarray*}
+Here we still use $x_A$ and $x_k$ to denote $x_{i^*A}$ and $x_{i^*k}$, a subset of outcomes on the new target $i^*$.
 
 From the fact that $T_1^*(x_A,x_k)$ is the Bayes rule when $A\cup\{k\}$, $x_{A\cup\{k\}}$ and $x_0$ are given, it should be no worse than $T_2^*(x_A)$ with regard to posterior expected loss, and hence we have:
 
 \begin{align*}
 &\int_{x_{A}}\int_{x_k} p\left( x_{A},x_k | x_0 \right)
-\left[ \sum_{j \in  T_1^*(x_A,x_k)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]\\ 
+\left[ \sum_{j \in  T_1^*(x_A,x_k)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right] {\rm d}x_A {\rm d}x_k\\
 &\leq 
 \int_{x_{A}}\int_{x_k} p\left( x_{A},x_k | x_0 \right)
-\left[ \sum_{j \in  T_2^*(x_A)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]
+\left[ \sum_{j \in  T_2^*(x_A)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]{\rm d}x_A {\rm d}x_k
 \end{align*}
 
-Notice that in our model, $x_A \indep x_k \, | \, \theta_{i^*}$ and $\theta_{i^*A}\indep \theta_{i^*k}\, | \, x_0$. So we have $x_A\indep x_k\,|\, x_0$, and hence:
+From Proposition 1, $x_A \indep x_k \, | \, x_0$, and hence we have:
 
 \begin{align*}
 &\int_{x_{A}}\int_{x_k} p\left( x_{A},x_k | x_0 \right)
-\left[ \sum_{j \in  T_2^*(x_A)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]\\
-    &= \int_{x_{A}}p\left(x_A|x_0\right)\sum_{j \in  T_2^*(x_A)}\left[\int_{x_k}p(x_k|x_0)\left(1-\mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k)\right)\right]\\
-&= \int_{x_{A}}p\left(x_A|x_0\right) \sum_{j \in  T_2^*(x_A)}\left[  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A) \right].
+\left[ \sum_{j \in  T_2^*(x_A)}  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k) \right]{\rm d}x_A {\rm d}x_k\\
+    &= \int_{x_{A}}p\left(x_A|x_0\right)\sum_{j \in  T_2^*(x_A)}\left[\int_{x_k}p(x_k|x_0)\left(1-\mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A,x_k)\right){\rm d}x_k\right] {\rm d}x_A\\
+&= \int_{x_{A}}p\left(x_A|x_0\right) \sum_{j \in  T_2^*(x_A)}\left[  1 - \mathbb{E} (\theta_{i^*,j} \, |\, x_0,x_A) \right]{\rm d}x_A.
 \end{align*}
 
 
