@@ -1,12 +1,11 @@
 ### Informer set selection function version 2
 ### Pre-step: Sample DPMM samples of cl_sample. 
-###         cl_sample includes cluster assignments AND possible outcomes on i*
 ###           A previous selected smaller informer set
 ### Input: list cl_sample, corresponding parameters a,b,iter,size,alpha; nT; x0
 ###         Pre-selected informer set inform, number of informers to add nAdd
 ### Output: Informer set A with size n+nAdd (via advanced adaptive selection)
 
-inform_beta2 <- function(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd){
+inform_beta2 <- function(cl_sample, P, iter, size, nT, a, b, x0, alpha, inform, nAdd){
   source("pel1_beta.R")
   step = 1
   n = length(inform)
@@ -14,7 +13,7 @@ inform_beta2 <- function(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAd
   while (step <= nAdd) {
     pel = rep(0,length(candidate))
     pel = sapply(candidate, function(x){
-      return(pel1_beta(cl_sample, iter, size, A = c(inform,x), nA = n+step,nT,a,b,x0, alpha))})
+      return(pel1_beta(cl_sample, P, iter, size, A = c(inform,x), nA = n+step,nT,a,b,x0, alpha))})
     tmp = candidate[order(pel)[1]]
     inform = c(inform, tmp)
     step = step + 1

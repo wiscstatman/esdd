@@ -1,9 +1,10 @@
 ## Input: A sample of clustering assignments cl_sample, sample size iter, informer set A and nA,
+##        List P, with P[[i]] a matrix summarizing the ith cluster assginment.
 ## top size nT, prior a and b, data x0, divergence alpha
 ## Output: PEL1 of A
 
-pel1_beta <- function(cl_sample, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2){
-  source("pel2.R")
+pel1_beta <- function(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2){
+  #source("pel2.R")
   ### Compute PEL1
   KK = cl_sample$KK
   NN = cl_sample$NN
@@ -27,7 +28,7 @@ pel1_beta <- function(cl_sample, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2
     }
     ### Computed PEL1
     tmp_pel1 = sapply(1:l, function(x){
-      post_theta = pel2_beta(tmp_cl, x0, xA = YA[x,], nA,A,nT,a,b,alpha)
+      post_theta = pel2_beta(P[[i]], x0, xA = YA[x,], nA,A,nT,a,b,alpha)
       return(repli[x]*sum(sort(1-post_theta)[1:nT]))
       })
     pel1[i] = sum(tmp_pel1) / size

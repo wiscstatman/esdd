@@ -74,8 +74,8 @@ for (k in 1:iter) {
 tmp = read.table("GDSC5_result.txt")
 pre_inform = as.numeric(unlist(strsplit(as.character(tmp$V2[i]), split = ' ')))
 
-#inform = inform_beta1(cl_sample,iter,size, nA = nA, nT = nT,a,b, x0 = train,alpha)
-inform = inform_beta2(cl_sample,iter,size,nT,a,b,x0 = train,alpha,
+#inform = inform_beta1(cl_sample, P, iter,size, nA = nA, nT = nT,a,b, x0 = train,alpha)
+inform = inform_beta2(cl_sample,P, iter,size,nT,a,b,x0 = train,alpha,
                       inform = pre_inform, nAdd = 2)
 
 inform = paste(inform, collapse = " ")

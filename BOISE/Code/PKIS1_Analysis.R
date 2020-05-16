@@ -1,4 +1,7 @@
+source("Initial_beta.R")
+source("Update_beta.R")
 source("dpmm_beta.R")
+source("clust_sum.R")
 source("pel1_beta.R")
 source("pel2.R")
 source("inform_beta_v1.R")
@@ -42,24 +45,7 @@ dim(cl_sample$XX) = c(iter, size, m)
 
 ## Create a matrix summarize information of each clustering.
 ## K by (n+1) matrix. Each row for one cluster, last column as number of targets in cluster
-P = list(rep(0,iter))
-n = nrow(train)
-m = ncol(train)
-for (j in 1:iter) {
-  K = cl_sample$KK[j]
-  N = cl_sample$NN[j,1:K]
-  tmp_cl = matrix(0,K,(m+1))
-  tmp_cl[,m+1] = N
-  tmp_cl[,1:m] = t(sapply(1:K,function(k){
-    target = which(cl_sample$CC[j,] == k)
-    if(length(target)==1){
-      return((a + train[target,])/2)
-    }else{
-      return((a + apply(train[target,], 2, sum))/(N[k] + 1))
-    }
-  }))
-  P[[j]] = tmp_cl
-}
+P = clust_sum(cl_sample,train,iter, a, b)
 ## Sample for x_i*
 for (j in 1:iter) {
   K = cl_sample$KK[j]
@@ -80,18 +66,18 @@ for (j in 1:iter) {
   })))
 }
 
-inform = inform_beta1(cl_sample,iter,size, nA = nA, nT = nT,a,b, x0 = train,alpha)
+inform = inform_beta1(cl_sample, P, iter,size, nA = nA, nT = nT,a,b, x0 = train,alpha)
 #tmp = read.table("Test6_result.txt")
 #pre_inform = as.numeric(unlist(strsplit(as.character(tmp$V2[i]), split = ' ')))
 # inform = inform_beta2(cl_sample,iter,size,nT,a,b,x0 = train,alpha,
 #                      inform = pre_inform, nAdd = 1)
 ## To maintain consistency, we would keep the initial clustering samples 
 ## and use the same assignments in all the computations.
-nef.result = Evaluate(cl_sample, inform, measure = "nef",test,train,
+nef.result = Evaluate(P, inform, measure = "nef",test,train,
                       nA,nT,iter,a,b,alpha)
-auc.result = Evaluate(cl_sample, inform, measure = "rocauc",test,train,
+auc.result = Evaluate(P, inform, measure = "rocauc",test,train,
                       nA,nT,iter,a,b,alpha)
-mcc.result = Evaluate(cl_sample, inform, measure = "mat",test,train,
+mcc.result = Evaluate(P, inform, measure = "mat",test,train,
                       nA,nT,iter,a,b,alpha)
-f1.result = Evaluate(cl_sample, inform, measure = "f",test,train,
+f1.result = Evaluate(P, inform, measure = "f",test,train,
                      nA,nT,iter,a,b,alpha)

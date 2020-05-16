@@ -4,8 +4,8 @@
 ## Output: A list cl_sample, including clustering assignments of size "iter * Start"
 
 dpmm_beta <- function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
-  source("Initial_beta.R")
-  source("Update_beta.R")
+#  source("Initial_beta.R")
+#  source("Update_beta.R")
   
   ## MCMC for random clustering
   n = dim(x0)[1]
@@ -31,6 +31,7 @@ dpmm_beta <- function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
     NN[i, ] = cl$N
     CC[i, ] = cl$C
   }
+  
   cl_sample = list(KK = KK, NN = NN, CC = CC)
   return(cl_sample)
 }
