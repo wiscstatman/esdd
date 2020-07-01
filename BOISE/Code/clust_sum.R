@@ -15,9 +15,16 @@ clust_sum <- function(cl_sample, dat, iter, a, b){
     tmp_cl[,1:m] = t(sapply(1:K,function(k){
       target = which(cl_sample$CC[j,] == k)
       if(length(target)==1){
-        return((a + dat[target,])/(1 + a[1] + b[1]))
+        missing = which(is.na(dat[target,]))
+        ak = a + dat[target,]
+        bk = b + (1 - dat[target,])
+        ak[missing] = a[missing]
+        bk[missing] = b[missing]
+        return(ak / (ak + bk))
       }else{
-        return((a + apply(dat[target,], 2, sum))/(N[k] + a[1]+b[1]))
+        ak = a + colSums(dat[target,], na.rm = T)
+        bk = b + colSums(1 - dat[target,], na.rm = T)
+        return(ak / (ak + bk))
       }
     }))
     P[[j]] = tmp_cl

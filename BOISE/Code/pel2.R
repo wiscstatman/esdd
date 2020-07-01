@@ -12,7 +12,8 @@ pel2_beta <- function (P, x0, xA, nA, A, nT = 10, a, b,alpha){
   theta = matrix(0, K + 1, m) # posterior expectations E(theta|x0,xA,ck,C)
   
   theta[K+1,] = a/(a+b)
-  theta[K+1,A] = (a[A]+xA)/(a[A]+b[A]+1)
+  # theta[K+1,A] = (a[A]+xA)/(a[A]+b[A]+1)
+  theta[K+1,A] = xA
   
   p[K + 1] = exp(sum(xA * log(a[A] / (a[A] + b[A]))) + 
                    sum((1 - xA) * log(b[A] / (a[A] + b[A]))))
@@ -21,17 +22,19 @@ pel2_beta <- function (P, x0, xA, nA, A, nT = 10, a, b,alpha){
   })
   
   theta[1:K,] = P[,1:m]
-  if(length(A) == 1){
-    theta[1:K, A] = (P[,A] * (P[,m+1] + rep(a[1]+b[1], K)) + xA) / 
-      (P[,m+1] + rep(a[1]+b[1], K) + 1)
-  } else{
-    theta[1:K,A] = t(as.matrix(apply(P[,c(A,m+1)], 1, function(q){
-      l = length(A)
-      counts = q[1:l] * (q[l+1]+a[1]+b[1])
-      counts = counts + xA
-      return(counts / (q[l+1]+a[1]+b[1]+1))
-    })))
-  }
+  theta[1:K, A] = t(matrix(rep(xA, K), nrow = nA, ncol = K))
+  # if(length(A) == 1){
+  #   theta[1:K, A] = (P[,A] * (P[,m+1] + rep(a[1]+b[1], K)) + xA) / 
+  #     (P[,m+1] + rep(a[1]+b[1], K) + 1)
+  # } else{
+  #   theta[1:K,A] = t(as.matrix(apply(P[,c(A,m+1)], 1, function(q){
+  #     l = length(A)
+  #     counts = q[1:l] * (q[l+1]+a[1]+b[1])
+  #     counts = counts + xA
+  #     return(counts / (q[l+1]+a[1]+b[1]+1))
+  #   })))
+  # }
+  
   ## P(xA|C,x0)
   #m = rep(0, K + 1)
   #m[1:K] = N[1:K] / (sum(N[1:K]) + alpha)

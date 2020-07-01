@@ -9,21 +9,7 @@ Update_beta <- function(cl, dat, a, b, alpha = 2){
   new_N = cl$N
   new_C = cl$C
   
-  ## Impute missing values
-  dat = unlist(sapply(1:m, function(j){
-    imp = dat[,j]
-    miss_label = which(is.na(imp))
-    tmp= unlist(sapply(miss_label,function(i){
-      target = which(new_C == new_C[i])
-      at= sum(dat[target,j], na.rm = T) + a[j] 
-      bt = length(target) - 1 - at + a[j] + b[j]
-      p = rbeta(1,at,bt)
-      return(rbinom(1,1,p))
-    }))
-    imp[miss_label] = tmp
-    return(imp)
-  }))
-  
+# Update labels
   for (i in 1:n) {
     if(new_N[new_C[i]] == 1){
       p = rep(0, new_K)
@@ -31,17 +17,23 @@ Update_beta <- function(cl, dat, a, b, alpha = 2){
         if(new_N[k] == 0){
           next
         } else if(k == new_C[i]){
-          p[k] = exp(log(alpha) + sum(dat[i,] * log(a / (a + b))) + 
-                       sum((1 - dat[i,]) * log(b / (a + b))))
+          p[k] = exp(log(alpha) + sum(dat[i,] * log(a / (a + b)), na.rm = T) + 
+                       sum((1 - dat[i,]) * log(b / (a + b)), na.rm = T))
         } else{
-          targets = which(new_C == k)
-          tmp = a
-          for (t in targets) {
-            tmp = tmp + dat[t, ]
+          subdat = dat[which(new_C == k),]
+          if(is.vector(subdat)){
+            missing = which(is.na(subdat))
+            ak = a + subdat
+            ak[missing] = a[missing]
+            bk = b + 1 - subdat
+            bk[missing] = b[missing]
+          } else{
+            ak = a + colSums(subdat, na.rm = T)
+            bk = b + colSums(1-subdat, na.rm = T)
           }
-          q = tmp / (a + b + new_N[k])
-          p[k] = exp(log(new_N[k]) + sum(dat[i, ] * log(q)) + 
-                       sum((1 - dat[i,]) * log(1 - q)))
+          q = ak / (ak + bk)
+          p[k] = exp(log(new_N[k]) + sum(dat[i, ] * log(q), na.rm = T) + 
+                       sum((1 - dat[i,]) * log(1 - q), na.rm = T))
         }
       }
       p = p / sum(p)
@@ -56,20 +48,26 @@ Update_beta <- function(cl, dat, a, b, alpha = 2){
       new_N[new_C[i]] = new_N[new_C[i]] - 1
       new_C[i] = 0
       p = rep(0, new_K + 1)
-      p[new_K + 1] = exp(log(alpha) + sum(dat[i,] * log(a / (a + b))) + 
-                           sum((1 - dat[i,]) * log(b / (a + b))))
+      p[new_K + 1] = exp(log(alpha) + sum(dat[i,] * log(a / (a + b)), na.rm = T) + 
+                           sum((1 - dat[i,]) * log(b / (a + b)), na.rm = T))
       for (k in 1:new_K) {
         if(new_N[k] == 0){
           next
         } else{
-          targets = which(new_C == k)
-          tmp = a
-          for (t in targets) {
-            tmp = tmp + dat[t, ]
+          subdat = dat[which(new_C == k),]
+          if(is.vector(subdat)){
+            missing = which(is.na(subdat))
+            ak = a + subdat
+            ak[missing] = a[missing]
+            bk = b + 1 - subdat
+            bk[missing] = b[missing]
+          } else{
+            ak = a + colSums(subdat,na.rm = T)
+            bk = b + colSums(1-subdat,na.rm = T)
           }
-          q = tmp / (a + b + new_N[k])
-          p[k] = exp(log(new_N[k]) + sum(dat[i, ] * log(q)) + 
-                       sum((1 - dat[i,]) * log(1 - q)))
+          q = ak / (ak + bk)
+          p[k] = exp(log(new_N[k]) + sum(dat[i, ] * log(q), na.rm = T) + 
+                       sum((1 - dat[i,]) * log(1 - q), na.rm = T))
         }
       }
       p = p / sum(p)
@@ -94,28 +92,30 @@ Update_beta <- function(cl, dat, a, b, alpha = 2){
 
 
 # #Test
-# load("clustering.RData")
-# load("pkis1.rda")
-# u <- foo$scaled.x
-# dat <- 1*(u > .5 )
-# rm(u)
-# rm(foo)
-# dat <- t(apply(pkis1, 1, function(x){
-#   thres = mean(x) + 2 * sd(x)
-#   return(as.numeric(x>thres))
-# }))
-# a = rep(3*mean(dat,na.rm = T), dim(dat)[2])
-# b = 3-a
-# cl = Initial_beta(dat,a,b,alpha = 30)
-# cl = Update_beta(cl, dat,a,b, alpha = 30)
-# for (i in 1:500) {
-#   cl = Update_beta(cl, dat,a,b, alpha = 30)
+# rm(list = ls())
+# GDSC = read.csv("GDSC.csv")
+# rownames(GDSC) = GDSC$X
+# GDSC$X = NULL
+# GDSC = apply(GDSC, 2, function(x){
+#   return(1*(x<=-2))
+# })
+# 
+# missing = apply(GDSC,1, function(x){
+#   return(sum(is.na(x)))
+# })
+# test.index = which(missing == 0)
+# test = GDSC[test.index,]
+# train = GDSC[-test.index,]
+# rm(GDSC)
+# source("Initial_beta.R")
+# a = rep(mean(train,na.rm = T),ncol(train))
+# b = 1-a
+# alpha = 10
+# cl = Initial_beta(train,a,b,alpha)
+# cl = Update_beta(cl, train, a, b, alpha)
+# n = 0
+# for (i in 1:50) {
+#    cl = Update_beta(cl, train,a,b, alpha)
+#    print(cl$K)
+#    n = n + cl$K
 # }
-# tmp = dat[which(cl$C==1),]
-# apply(tmp,2,function(x){return(mean(x,na.rm = T))})
-# tmp = dat[which(cl$C==2),]
-# apply(tmp,2,function(x){return(mean(x,na.rm = T))})
-# tmp = dat[which(cl$C==3),]
-# apply(tmp,2,function(x){return(mean(x,na.rm = T))})
-# sum(cl$xi)
-# which(cl$xi == 1)
