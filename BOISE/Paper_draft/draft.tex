@@ -24,6 +24,8 @@
 \newcommand{\blue}[1]{{\color{blue} #1}}
 \newcommand{\indep}{\perp \!\!\! \perp}
 
+\newcommand{\peng}[1]{{\color{blue} Peng:[{#1}]}}
+
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{C}[1]{>{\centering\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
@@ -61,7 +63,53 @@ In early stage drug discovery, there has been significant recent effort in devel
 
 
 \section{Introduction} \label{sec:introduction}
-Informer based ranking (IBR) strategies are a family of methods that arise from early-stage drug discovery (Zhang, Ericksen, and Lee {\em et al.} 2019). It is designed for computational guidance of drug-discovery experiments. The context is virtual screening (Sliwoski {\em et al.} 2014).  Briefly speaking, a chemical screening facility receives material representing a purified protein target, and is tasked with identifying drugs that may have some inhibitory effect on the bioactivity of the protein.  For example, Zhang, Ericksen, and Lee {\em et al.} (2019) report on drugs that affect certain protein kinases.
+
+Chemical screening labs, such as core service facilities
+in academic medical centers, are often faced with the following experimental design problem.  Having received some quantity of
+a purified protein target, they must plan and deploy experimental
+assays to identify which if any available drugs  have some inhibitory effect on the bioactivity of the supplied protein.  Within this 
+general setting are very many different possibilities related to the
+nature of the assays (e.g. complexity, cost), information
+about the target protein (e.g., sequence, structure, affinities), and 
+aspects of the library of drugs that may be screened, be they available
+in house or synthesized to order (citation).  Computational guidance
+is critical in contemporary applications, considering costs and the
+expanse of the space of potential molecules. Physical experiments are preceded by potentially extensive virtual screening calculations that
+utilize information in novel ways, such as through molecular docking computations, when structures are available (cite), or machine learning 
+computations that build predictive models of the experimental outcomes (cite Tony).  Ultimately experiments are deployed and a panel of drugs is tested for bioactivity against the target protein.  
+
+Within this large research domain, we focus on an extreme though not
+uncommon case in which very little information is available on the target protein, beyond the knowledge that the target is
+from a class of proteins for which 
+bioactivity of a panel of drug 
+compounds has already been measured.  
+We address the specific challenge problem described 
+in Zhang {\em et al.} (2019) to deploy {\em informer based ranking} (IBR)
+strategies.  Such a strategy involves a small set of drug compounds
+that are identified from the preliminary bioactivity data on related proteins
+and for which experiments will be performed in order rank-order 
+remaining compounds for subsequent testing.  Statistically, an IBR 
+strategy 
+attempts to solve a compound decision problem [that's compound as
+in multifaceted not compound as in drug compound!][citation] \peng{I was thinking this citation should still be Zhang {\em et al.} 2019 as IBR is defined in that paper}. 
+There is the question of how to constitute the small set 
+of drugs as well as the question of what to do with intermediate data
+measured on these drugs in order to prioritize the 
+remaining compounds. In this work
+we compare 
+available IBR strategies to novel strategies developed from a decision-theoretic perspective.  Using Bayesian decision theory
+and a flexible model of bioactivity data, our novel IBR strategies
+are mathematically lean,  computationally efficient, and
+have superior predictive accuracy compared to existing schemes in *two* substantial empirical studies.**on
+protein kinases and ??** \peng{maybe call it drug sensitivity in cancer?}
+
+
+
+
+
+**not revised follows, but a bunch of these points below in the intro might do better in a final discussion section...**
+
+ The context is virtual screening (Sliwoski {\em et al.} 2014).    For example, Zhang, Ericksen, and Lee {\em et al.} (2019) report on drugs that affect certain protein kinases.
 The facility has specific biochemical assays that test for inhibitory effects of a given drug, and it has access to a very large library of different drug compounds, some small fraction of which are expected to have bioactivity against the new target.   
 Costs limit the number of compounds that may be screened experimentally.   The virtual screening task is to prioritize the drugs in advance of experimental screening by some computations so as to
 improve the hit rate of the experiments performed on the new target.
@@ -330,29 +378,29 @@ The Chinese restaurant process representation~(\ref{eq:CR}) implies we can write
 \begin{align}
 \label{eq: DPMM2}
 \begin{split}
-    x_i\,|\,c,\phi &\sim F(\phi_{c_i});\\
-    c_i\,|\,p &\sim {\rm Discrete}(p_1,\cdots,p_K);\\
+    x_i\,|\,c,\phi &\sim F(\phi_{c(i)});\\
+    c(i)\,|\,p &\sim {\rm Discrete}(p_1,\cdots,p_K);\\
     \phi_c &\sim G_0;\\
     p_1,\cdots,p_K &\sim {\rm Dirichlet}(\frac{m_0}{K},\cdots,\frac{m_0}{K})
 \end{split}
 \end{align}
-where $c_i$ is the cluster label that we need in clustering. When $K\to \infty$ the conditional distribution $c_i\,|\,c_1,\cdots,c_{i-1}$ will approximate a Chinese restaurant process, and model~(\ref{eq: DPMM2}) is equivalent to~(\ref{eq:DPMM}). By taking the limit, the posterior distribution of $c_i$ given all other cluster labels $c_{-i}$, observation $x_i$ and parameters corresponding to existing clusters $\Phi = (\phi_1,\cdots,\phi_K)$ is:
+Note that we use $c(i)$ to denote cluster label of $i$-th target, $i = 1,2,\cdots,m$, and $c_k$ to denote indices of targets that fall in $k$-th cluster, $k=1,2,\cdots,K$. $c(i) = k$ if and only if $i \in c_k$. When $K\to \infty$ the conditional distribution $c(i)\,|\,c(1),\cdots,c(i-1)$ will approximate a Chinese restaurant process, and model~(\ref{eq: DPMM2}) is equivalent to~(\ref{eq:DPMM}). By taking the limit, the posterior distribution of $c(i)$ given all other cluster labels $c(-i)$, observation $x_i$ and parameters corresponding to existing clusters $\Phi = (\phi_1,\cdots,\phi_K)$ is:
 
 \begin{equation}\label{eq:Postphi}
-P(c_i = c\,|\, c_{-i}, x_i, \Phi) \propto \begin{cases}
-		\frac{m_{-i,c}}{m-1+m_0}F(x_i,\phi_c), &\text{ if }
-	    \exists \, c_j = c, j\neq i\\
+P(c(i) = k\,|\, c(-i), x_i, \Phi) \propto \begin{cases}
+		\frac{m_{-i,k}}{m-1+m_0}F(x_i,\phi_k), &\text{ if }
+	    \exists \, c(j) = k, j\neq i\\
 		\frac{m_0}{m-1+m_0}\int F(y_i,\phi)dG_0(\phi). & \text{ if }
-		\nexists \, c_j = c, j \neq i.
+		\nexists \, c(j)= k, j \neq i.
 	\end{cases}
 \end{equation}
-Equation~(\ref{eq:Postphi}) is already eligible for Gibbs sampling on $(c, \phi_c)$, however, under conjugate prior setting we can even collapse computation by integrating $\phi_c$ out: Define $H_{-i,c}(\phi) = P\left(\phi\,|\,G_0,\{x_j:j\neq i, c_j = c\} \right)$ to be the posterior distribution of $\phi_c$ given $G_0$ and all other observations $x_j$ in cluster $c$ except $x_i$, then equation~(\ref{eq:Postphi}) can be marginally written as:
+Equation~(\ref{eq:Postphi}) is already eligible for Gibbs sampling on $(k, \phi_k)$, however, under conjugate prior setting we can even collapse computation by integrating $\phi_k$ out: Define $H_{-i,k}(\phi) = P\left(\phi\,|\,G_0,\{x_j:j\neq i, c(j)= k\} \right)$ to be the posterior distribution of $\phi_k$ given $G_0$ and all other observations $x_j$ in cluster $k$ except $x_i$, then equation~(\ref{eq:Postphi}) can be marginally written as:
 \begin{equation}\label{eq:Postc}
-P(c_i = c\,|\, c_{-i}, x_i) \propto \begin{cases}
-		\frac{m_{-i,c}}{m-1+m_0}\int F(x_i,\phi)dH_{-i,c}(\phi), &\text{ if }
-	    \exists \, c_j = c, j\neq i\\
+P(c(i) = k\,|\, c(-i), x_i) \propto \begin{cases}
+		\frac{m_{-i,c}}{m-1+m_0}\int F(x_i,\phi)dH_{-i,k}(\phi), &\text{ if }
+	    \exists \, c(j) = k, j\neq i\\
 		\frac{m_0}{m-1+m_0}\int F(y_i,\phi)dG_0(\phi). & \text{ if }
-		\nexists \, c_j = c, j \neq i.
+		\nexists \, c(j)= k, j \neq i.
 	\end{cases}
 \end{equation}
 This conditional distribution~(\ref{eq:Postc}) leads to the Gibbs sampling method summarized in Neal (2000), which is applied in BOISE computation:
@@ -361,18 +409,18 @@ This conditional distribution~(\ref{eq:Postc}) leads to the Gibbs sampling metho
 \caption{DPMM clustering}\label{Algo1}
 \begin{algorithmic}[1]
 \State Set the prior mass $m_0$ and other hyperparameters;
-\State Initialize $c_1,\cdots,c_m$ with regard to Chinese restaurant process CR($m_0$);
+\State Initialize $c(1),\cdots,c(m)$ with regard to Chinese restaurant process CR($m_0$);
 \State Set sample size of clustering assignments $M$, and gaps between successive draws $N$
 \While{Sample size $< M$}
     \For{$i=1, \cdots, m$}
-        \State Update $i$th cluster label from posterior distribution $P(c_i\,|\,c_{-i},y_i)$ in~(\ref{eq:Postc})
+        \State Update $i$th cluster label from posterior distribution $P(c(i)\,|\,c(-i),y_i)$ in~(\ref{eq:Postc})
     \EndFor
 \State Sample one clustering assignment after every $N$ label updates.
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
-Notice that under BOISE setting, base distribution $G_0$ is a conjugate prior ${\rm Beta}(\alpha_0,\beta_0)$ on each component, and hence posterior distribution $H_{-i,c}(\phi)$ can be computed analytically. Therefore, we could have a closed form expression for posterior distribution $P(c_i\,|\,c_{-i},y_i)$ in ~(\ref{eq:Postc}), and Algorithm \ref{Algo1} will help us sample clustering assignments fast and efficiently. 
+Notice that under BOISE setting, base distribution $G_0$ is a conjugate prior ${\rm Beta}(\alpha_0,\beta_0)$ on each component, and hence posterior distribution $H_{-i,k}(\phi)$ can be computed analytically. Therefore, we could have a closed form expression for posterior distribution $P(c(i)\,|\,c(-i),y_i)$ in ~(\ref{eq:Postc}), and Algorithm \ref{Algo1} will help us sample clustering assignments fast and efficiently. 
 
 \subsection{PEL}
 In this section, we will focus on how to calculate ${\rm PEL}_1(x_0,A)$ for given $A$ and $x_0$, and this will help evaluate each candidate $A$ to select the final informer set. As $x_0$ is always fixed, we will write ${\rm PEL}_1(x_0,A)$ as ${\rm PEL}_1(A)$ for simplicity. Recall the definition of ${\rm PEL}_1(A)$ is:
@@ -508,31 +556,34 @@ Since $H(c(i^*)\,|\,\mathcal{C},x_0)$ is a constant when $\mathcal{C}$ and $x_0$
 As mentioned in the beginning of this section, the major advantage of Algorithm \ref{Algo4} compared with Algorithm \ref{Algo3} is running time. In Algorithm \ref{Algo4} we bypass the computation of $\mathbb E\left(\theta_{ij}\,|\, x_0,x_A\right)$ and only use $p_k = P(i^*\in c_k\,|\, \mathcal C,x_0,x_A)$ to select informer set. This can improve our BOISE running time from days to hours while still maintaining similar performance. Therefore, we name it as "Accelerated-BOISE" in our empirical analysis. Also, although Accelerated-BOISE uses different informer selection method as BOISE does, they both share the same top set rule $T^*(A,x_A,x_0)$, which scores each $j\in J$ with their posterior expectation and choose the top $n_T$ as top set.  
 
 \subsection{Missing Data Imputation}
-As a Bayesian computation procedure, BOISE is naturally compatible with missing data imputations while previous informer based ranking methods are only designed for complete data sets. We will briefly discuss about missing data imputation in this section. 
-There are two procedures in BOISE that require missing data imputation: we need imputed data to update cluster labels in DPMM clustering, and we need a complete $x_0$ to determine $a_{kj}$ and $b_{kj}$ in informer selection. Therefore, we have two different strategies for missing value imputation summarized in Algorithm \ref{Algo5}:
+As a Bayesian computation procedure, BOISE is naturally compatible with missing data while previous informer based ranking methods are only designed for complete data sets. We will briefly discuss about how to deal with missing data in this section. 
+
+There are two procedures in BOISE that are influenced by missing data: Cluster label updates in DPMM clustering, and posterior expectation calculation in informer selection. Both procedures rely on $a_{kj}$ and $b_{kj}$ in (\ref{eq:Posterior1}) to determine the posterior Beta distribution of $j$-th compound in $k$-th cluster. Therefore, we only need to get $a_{kj}$ and $b_{kj}$ under missing value settings. 
+
+One way to do this is to focus on non-missing entries in original data $x_0$, inspired by Marlin (2008). We use $r_{ij} = 1$ to denote response indicator of entry $x_{ij}$. Since the probability of response $P(r_{ij} = 1)$ has nothing to do with missing data values or latent variables, we can assume that missing values are missing at random. Therefore, similar to Section 4.2 in Marlin (2008), we can calculate $a_{kj}$ and $b_{kj}$ by:
+\begin{eqnarray}
+\label{Posterior6}
+a_{kj} = \alpha_0 + \sum_{i\in c_k} x_{ij} \mathbbm{1}(z_{ij} = 1); b_{kj} = \alpha_0 + \sum_{i\in c_k}(1- x_{ij}) \mathbbm{1}(z_{ij} = 1).
+\end{eqnarray}
+We summarize this version of BOISE for missing data in Algorithm \ref{Algo5}:
 \begin{algorithm}
-\caption{Missing data imputation}\label{Algo5}
+\caption{BOISE with Missing Data}\label{Algo5}
 \begin{algorithmic}[1]
 \State Set the prior mass $m_0$ and other hyperparameters;
 \State Set sample size of clustering assignments $M$, and gaps between successive draws $N$
-\State \textbf{Initialize}: Let $N_{ij} = 0$ for each missing entry $x_{ij}$. Sample $c_1,\cdots,c_m$ with regard to Chinese restaurant process CR($m_0$);
+\State \textbf{Initialize}: Let $N_{ij} = 0$ for each missing entry $x_{ij}$. Sample $c(1),\cdots,c(m)$ with regard to Chinese restaurant process CR($m_0$);
 \While{Sample size $< M$}
-    \State For each missing entry $x_{ij}$ currently in cluster $c$, sample a success rate $\phi_{cj}$ from $P\left(\phi\,|\,G_0,\{x_j:j\neq i, c_j = c\} \right)$.
-    \State Impute $x_{ij}$ with ${\rm Bernoulli}(\phi_{cj})$. Let $N_{ij} \gets N_{ij}+x_{ij}$
     \For{$i=1, \cdots, m$}
-        \State Update $i$th cluster label from posterior distribution $P(c_i\,|\,c_{-i},y_i)$ in~(\ref{eq:Postc})
+        \State Calculate $a_{kj}$ and $b_{kj}$ as in (\ref{Posterior6})
+        \State Update $i$th cluster label from posterior distribution $P(c(i)\,|\,c(-i),y_i)$ in~(\ref{eq:Postc})
     \EndFor
 \State Sample one clustering assignment after every $N$ label updates.
 \EndWhile
-\If {$N_{ij} > M/2$}
-    \State Impute $x_{ij}$ as $1$.
-\Else
-    \State Impute $x_{ij}$ as $0$.
-\EndIf
+\State For each sampled clustering assignment, calculate $a_{kj}$ and $b_{kj}$ for each cluster $k$ and compound $j$, based on (\ref{Posterior6}).
+\State Select informer set as in Algorithm \ref{Algo3}
 \end{algorithmic}
 \end{algorithm} 
 
- For DPMM clustering, we impute all missing entries after a thorough update of labels, that is, after we update all cluster labels $c_i$ for $i=1,\cdots,m$, we re-sample the value of missing entries based on posterior distribution $H_{-i,c}(\phi) = P\left(\phi\,|\,G_0,\{x_j:j\neq i, c_j = c\} \right)$. When all the clustering assignment samples are drawn, we summarize how many times each missing entry is imputed as $1$, say $N_{ij}$, and impute $x_{ij}$ as $1$ if $N_{ij}$ is greater than some threshold, like $50\%$ of clustering sample size. Then we can proceed with this imputed complete data. 
 
 \section{Empirical Results}
 We compare BOISE and Accelerated-BOISE with previous methods on two data sets: One is PKIS1 data set, which is thoroughly analyzed in  Zhang, Ericksen, and Lee {\em et al.} (2019). The other is GDSC data set, which contains sensitivity data between cancer cell lines and anti-cancer drugs. Both data sets are matrices with continuous values and can be converted to binary matrices meaningfully. The metrics we mainly use to evaluate model performance are ROCAUC and NEF10, which are standard metrics in virtual screening publications and consistent with Zhang, Ericksen, and Lee {\em et al.} (2019). Some other  classification metrics like F1 score and Matthew's Correlation Coefficent (MCC) are also included in supplementary. 
@@ -641,10 +692,28 @@ Figure \ref{fig:mcc} shows that (AC)-BOISE are still best under these classifica
 
 
 \subsection{GDSC Data Set}
-GDSC data set is a drug sensitivity data set in cancer study. The original data is downloaded from \url{ftp://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/current_release/GDSC1_fitted_dose_response_25Feb20.xlsx}. It contains sensitivity data of each pair between anti-cancer drugs and cancer cell lines. The data set has already been pre-processed, and we care about the Z-score between each drug and each cancer cell line, with Z-score $\leq -2$ meaning the cancer cell line is sensitive to the drug. In other words, GDSC data set can be binarized without using 2SD criteria. During data cleaning, we also drop drugs and cell lines with too many missing values and finally we end up with a $281\times 207$ GDSC data matrix, with each row as a cancer cell line and each column as an anti-cancer drug. Each entry of the data matrix is continuous sensitivity Z-score, and we derive the binary sensitive matrix by simple threshold $\mathbbm{1}(z_{ij}\leq -2)$. 
+GDSC data set is a drug sensitivity data set in cancer study. The original data is downloaded from \url{ftp://ftp.sanger.ac.uk/pub/project/cancerrxgene/releases/current_release/GDSC1_fitted_dose_response_25Feb20.xlsx}. It contains sensitivity data of each pair between $304$ anti-cancer drugs and $987$ cancer cell lines. The data set has already been pre-processed, and we care about the Z-score between each drug and each cancer cell line, with Z-score $\leq -2$ meaning the cancer cell line is sensitive to the drug. In other words, GDSC data set can be binarized without using 2SD criteria. There are $15\%$ entries missing in GDSC. We apply two analysis on GDSC data set: One comparison on a selected non-missing subset of GDSC to show BOISE works on data sets other than human kinase, and the other is comparison on original GDSC to show Algorithm \ref{Algo5} works for missing data. 
 
-Similar to PKIS1 data set, our goal is still to rank the anti-cancer drugs in GDSC when a new cancer cell line comes in, with help of a fixed length informer set $A$. As there is no new cancer cell line test data available currently, we only conduct leave-one-out retrospective cross validation on GDSC data set. Also, since Coding Selection (CS) method is too computational extensive and  performance of Coding Selection can be bounded by Adaptive Selection (AS) and Regression Selection (RS) from previous analysis, we choose not to include CS in our comparison on GDSC data set. 
+Similar to PKIS1 data set, our goal is to rank the anti-cancer drugs in GDSC when a new cancer cell line comes in, with help of a fixed length informer set $A$.  Since Coding Selection (CS) method is too computational extensive and  performance of Coding Selection can be bounded by Adaptive Selection (AS) and Regression Selection (RS) from previous analysis, we choose not to include CS in our comparison on GDSC data set. 
 
+\subsubsection{Comparison with Missing Data}
+To analyze BOISE performance under missing value settings, we divide the original GDSC data set into training set with $964$ cell lines and test set with $23$ cell lines. The cell lines in test set are those with no missing values on all 304 anti-cancer drugs.  
+
+We apply Algorithm \ref{Algo5} on training set with informer size $n_A = 8$. Since all previous IBR methods are designed for complete data set, we apply Python package fancyimpute (\url{https://pypi.org/project/fancyimpute/}) to impute the missing values in training set, then apply RS, AS and BF on the imputed data set. Among all the imputation methods provided by fancyimpute, we find KNN imputation leads to the best retrospective results for previous IBR methods. The results are shown in Figure \ref{fig:mgdsc}
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=5.0in]{mGDSC8.png}
+\caption{\label{fig:mgdsc} 
+{\bf Violin plot comparison of different methods under informer sizes $n_A =8$ on original GDSC with respect to compound ranking performance assessed by NEF10 and ROCAUC on test set.} Each method is trained on training set and evaluated on test set with. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
+\end{figure}
+
+In Figure \ref{fig:mgdsc} we show that BOISE and AC-BOISE perform better than previous IBR methods on test set, with informer size $n_A = 8$. Adaptive Selection (AS8) is the best method other than (AC-)BOISE, and paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0742$ with p-value $= 0.03243$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0601$ with p-value $= 0.03373$.
+
+\subsubsection{Comparison with Non-missing Subset}
+To select a non-missing subset of GDSC data set, we drop drugs and cell lines with too many missing values and end up with a $281\times 207$ complete data set. Each row is a cancer cell line and each column is an anti-cancer drug. Every entry of the data matrix is continuous sensitivity Z-score, and we derive the binary sensitive matrix by simple threshold $\mathbbm{1}(z_{ij}\leq -2)$. 
+
+In Figure \ref{fig:gdsc} we show that BOISE and AC-BOISE are better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than (AC-)BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between BOISE16 and AS16 is $0.0448$ with p-value $= 2.837\times 10^{-8}$; the mean difference in ROCAUC between BOISE16 and AS16 is $0.0781$ with p-value $<2.2\times 10^{-16}$. 
 
 \begin{figure}[!ht]
 \centering
@@ -653,7 +722,6 @@ Similar to PKIS1 data set, our goal is still to rank the anti-cancer drugs in GD
 {\bf Violin plot comparison of different methods under informer sizes $n_A =8$ and $n_A = 16$ on GDSC data set with respect to compound ranking performance assessed by NEF10 and ROCAUC.} Each method is evaluated through leave one out cross validation of GDSC cancer cell lines. The median and interquartile ranges are displayed as a white circle and black bars, respectively.}
 \end{figure}
 
-In figures \ref{fig:gdsc} we show that BOISE and AC-BOISE are better than previous methods on the new GDSC data set, with informer size $n_A = 8$ and $n_A = 16$. In particular, Adaptive Selection (AS8 and AS16) is the best method other than (AC-)BOISE. When $n_A = 8$, paired t-test shows that the mean difference in NEF10 between BOISE8 and AS8 is $0.0315$ with p-value $= 1.743\times 10^{-4}$; the mean difference in ROCAUC between BOISE8 and AS8 is $0.0493$ with p-value $= 3.756\times 10^{-10}$; When $n_A = 16$, paired t-test shows that the mean difference in NEF10 between BOISE16 and AS16 is $0.0448$ with p-value $= 2.837\times 10^{-8}$; the mean difference in ROCAUC between AC-BOISE16 and AS16 is $0.0781$ with p-value $<2.2\times 10^{-16}$. 
 
 
 \section{Discussion}
@@ -953,6 +1021,8 @@ so $\hat{A}$ is not the Bayes rule.
 \item Kitchen, D.B., Decornez, H., Furr, J.R., and  Bajorath J. (2004), "Docking and scoring in virtual screening for drug discovery: methods and applications," {\em Nature Reviews Drug Discovery}, 3(11), 935-949.
 
 \item Li, H. and Hong, F., (2001), "Cluster-Rasch models for microarray gene expression data," {\em Genome biology}, 2(8), research0031-1.
+
+\item Marlin, B.M. (2008), "Missing Data Problems in Machine Learning," Doctoral dissertation: University of Toronto.
 
 \item Neal, R.M. (2000), "Markov Chain Sampling Methods for Dirichlet Process Mixture Models," {\em Journal of Computational and Graphical Statistics}, 9, 249-265.
 
