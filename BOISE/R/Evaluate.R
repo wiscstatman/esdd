@@ -1,10 +1,5 @@
-### Evaluation of selected informer set given the DPMM sampling
-## Input: DPMM cluster sampling "cl_sample", informer set "inform",
-##        measurement criteria "measure", test set, train set, nA, nT, 
-##        MCMC sample size iter, priors a and b, prior mass alpha
-## Output: Evaluated value under given criteria
-
-Evaluate <- function(cl_sample, inform, measure,
+Evaluate <-
+function(cl_sample, inform, measure,
                      test, train, nT, iter, a, b ,alpha){
   #source("npel2.R")
   #source("clust_sum.R")

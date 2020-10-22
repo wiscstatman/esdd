@@ -1,9 +1,5 @@
-## Input: A sample of clustering assignments cl_sample, sample size iter, informer set A and nA,
-##        List P, with P[[i]] a matrix summarizing the ith cluster assginment.
-## top size nT, prior a and b, data x0, divergence alpha
-## Output: PEL1 of A
-
-pel1_beta <- function(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2){
+pel1_beta <-
+function(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2){
   #source("npel2.R")
   ### Compute PEL1
   XA = matrix(0, iter*size, nA)

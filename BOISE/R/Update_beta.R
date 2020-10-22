@@ -1,8 +1,5 @@
-### Dirichlet process updating for one iteration (based on Neal's 2000 Paper, Algorithm 3)
-## Input: prior vectors a, b, divergence alpha, data, old cl list of {K, N, C}
-## Output a new cl list {K, N, C}
-
-Update_beta <- function(cl, dat, a, b, alpha = 2){
+Update_beta <-
+function(cl, dat, a, b, alpha = 2){
   n = dim(dat)[1]
   m = dim(dat)[2]
   new_K = cl$K

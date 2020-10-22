@@ -1,10 +1,5 @@
-## Input: Matrix P summarize the cluster assignment information (For computation)
-##        Informer set A, Data matrix x0, Intermediate data xA, 
-##        Informer size nA, Top size nT, 
-##        prior a,b, divergence alpha
-## Output: PEL2 value (given x0,xA,Cl) [posterior expected theta E(theta|C,x0,xA)]
-
-pel2_beta <- function (P, x0, xA, nA, A, nT = 10, a, b,alpha){
+pel2_beta <-
+function (P, x0, xA, nA, A, nT = 10, a, b,alpha){
   K = nrow(P)
   m = ncol(x0)
   n = nrow(x0)

@@ -1,9 +1,5 @@
-## MCMC sampling for conjugate prior (Beta-binomial) clustering assignments
-## Input: prior vector a,b, data matrix x0, warm-up step length warm, sample size iter, 
-## gap between two samples step, divergence alpha 
-## Output: A list cl_sample, including clustering assignments of size "iter * Start"
-
-dpmm_beta <- function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
+dpmm_beta <-
+function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
 #  source("Initial_beta.R")
 #  source("Update_beta.R")
   
@@ -35,4 +31,3 @@ dpmm_beta <- function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
   cl_sample = list(KK = KK, NN = NN, CC = CC)
   return(cl_sample)
 }
-

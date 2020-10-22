@@ -1,11 +1,5 @@
-### BOISE selection for augmentation of an existing informer set, usually used in HPC.
-### Pre-step: Sample DPMM samples of cl_sample. 
-###           A previous selected smaller informer set inform.
-### Input: list cl_sample, corresponding parameters a,b,iter,size,alpha; nT; x0
-###         Pre-selected informer set inform, number of informers to add nAdd
-### Output: Informer set A with size n+nAdd (via advanced adaptive selection)
-
-Boise_Aug <- function(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd){
+Boise <-
+function(cl_sample, iter, size, nA, nT, a, b, x0, alpha){
   #source("clust_sum.R")
   #source("npel1.R")
   if (!require('parallel')) {
@@ -39,17 +33,22 @@ Boise_Aug <- function(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd){
   }
   ## BOISE selection based on pel1
   step = 1
-  n = length(inform)
-  candidate = (1:dim(x0)[2])[-inform]
-  while (step <= nAdd) {
+  pel1 = unlist(mclapply(1:dim(x0)[2], function(x){
+    return(pel1_beta(cl, P, iter, size, A = x, nA = step, nT,a,b,x0, alpha))},
+    mc.cores = detectCores()))
+  
+  tmp = order(pel1)[1]
+  inform = tmp
+  candidate = order(pel1)
+  while (step < nA) {
+    step = step +1
+    candidate = candidate[-which(candidate == tmp)]
     pel = rep(0,length(candidate))
     pel = unlist(mclapply(candidate, function(x){
-      return(pel1_beta(cl, P, iter, size, A = c(inform,x), nA = n+step,nT,a,b,x0, alpha))},
+      return(pel1_beta(cl, P, iter, size, A = c(inform,x), nA = step,nT,a,b,x0, alpha))},
       mc.cores = detectCores()))
     tmp = candidate[order(pel)[1]]
     inform = c(inform, tmp)
-    step = step + 1
-    candidate = candidate[-which(candidate == tmp)]
   }
   return(inform)
 }

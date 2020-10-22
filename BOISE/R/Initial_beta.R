@@ -1,9 +1,5 @@
-### Innitialization based on Chinese Restaurant Process for conjugate prior DPMM
-## Input: number of targets to be clustered n, divergency parameter alpha
-## Output: A list of {K, N, C,xi}. K = number of clusters, N = #of targets in each cluster, 
-## C = cluster assignment (including new target), x_i* = sampled outcome on new target.
-
-Initial_beta <- function(dat, a, b, alpha = 2){
+Initial_beta <-
+function(dat, a, b, alpha = 2){
   n = dim(dat)[1]
   m = dim(dat)[2]
   N = rep(0, 2 * n)
