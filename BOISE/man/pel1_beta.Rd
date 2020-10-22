@@ -5,8 +5,8 @@
   function to compute PEL-1 loss of an informer set
 }
 \description{
-Input: A sample of clustering assignments cl_sample, sample size iter, informer set A and nA, list P, with P[[i]] a matrix summarizing the ith cluster assginment. top size nT, prior a and b, data x0, divergence alpha
-Output: PEL1 of A
+Input a sample of clustering assignments cl_sample, sample size iter, informer set A and nA, list P, with P[[i]] a matrix summarizing the ith cluster assginment. top size nT, prior a and b, data x0, divergence alpha
+Output the PEL1 of A
 }
 \usage{
 pel1_beta(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2)
@@ -14,37 +14,37 @@ pel1_beta(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl_sample}{
-%%     ~~Describe \code{cl_sample} here~~
+  An augmented list of clustering assignments as well as the sampled outcomes on the new target i*. cl_sample now is {KK, NN, CC, XX}, where XX contains "size" samples of possible outcomes on i*.
 }
   \item{P}{
-%%     ~~Describe \code{P} here~~
+  An intermediate matrix P that is computed by clust_sum function. It summarizes the cluster assignment information of given cl_sample.
 }
   \item{iter}{
-%%     ~~Describe \code{iter} here~~
+Sample size of DPMM clustering
 }
   \item{size}{
-%%     ~~Describe \code{size} here~~
+Sample size of possible intermediate outcomes xA
 }
   \item{A}{
-%%     ~~Describe \code{A} here~~
+Informer set
 }
   \item{nA}{
-%%     ~~Describe \code{nA} here~~
+Length of informer set
 }
   \item{nT}{
-%%     ~~Describe \code{nT} here~~
+Length of top set, used to define loss function in BOISE.
 }
   \item{a}{
-%%     ~~Describe \code{a} here~~
+Prior hyperparameters alpha0
 }
   \item{b}{
-%%     ~~Describe \code{b} here~~
+Prior hyperparameters beta0
 }
   \item{x0}{
-%%     ~~Describe \code{x0} here~~
+Original interaction data.
 }
   \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+Chinese restaurant prior mass m0
 }
 }
 \details{
@@ -73,44 +73,18 @@ pel1_beta(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, 
-    alpha = 2) 
-{
-    XA = matrix(0, iter * size, nA)
-    for (i in 1:iter) {
-        XA[(size * i - size + 1):(size * i), ] = cl_sample$XX[i, 
-            , A]
-    }
-    XA = apply(XA, 1, function(x) {
-        return(paste(x, collapse = ""))
-    })
-    tab = table(XA)
-    YA = names(tab)
-    l = length(tab)
-    tmp_pel2 = sapply(1:l, function(x) {
-        xA = as.numeric(strsplit(YA[x], "")[[1]])
-        post_probs = matrix(0, 1, iter)
-        post_thetas = matrix(0, iter, ncol(x0))
-        for (k in 1:iter) {
-            postls = pel2_beta(P[[k]], x0, xA, nA, A, nT, a, 
-                b, alpha)
-            post_probs[k] = postls$post_prob
-            post_thetas[k, ] = postls$post_theta
-        }
-        post_probs = post_probs/(sum(post_probs))
-        Score = post_probs \%*\% post_thetas
-        return(sum(sort(1 - Score)[1:nT]))
-    })
-    pel1 = (tmp_pel2 * tab)/iter
-    return(sum(pel1)/size)
-  }
+#suppose you have the dat and cl_sample as in dpmm_beta
+P = clust_sum(cl_sample, dat, iter = length(cl_sample$KK), a, b)
+size = 1000
+n = nrow(dat)
+m = ncol(dat)
+cl_sample$XX = rep(0, iter * size * m)
+dim(cl_sample$XX) = c(iter, size, m)
+for (j in 1:iter) {
+    toy_samples = rbinom(size*m, 1, 0.5)
+    dim(toy_samples) = c(size, m)
+    cl_sample$XX[j, , ] = toy_samples
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+pel1 = pel1_beta(cl_sample, P,iter, size, A = c(1,2), nA=length(A), nT=10, a, b, x0 = dat, alpha = 15)
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

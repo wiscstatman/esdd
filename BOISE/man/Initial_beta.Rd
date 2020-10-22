@@ -5,8 +5,7 @@
   intermediate function to initial Chinese Restaurant Process for conjugate prior DPMM
 }
 \description{
-Input: number of targets to be clustered n, divergency parameter alpha
-Output: A list of {K, N, C,xi}. K = number of clusters, N = #of targets in each cluster, C = cluster assignment (including new target), x_i* = sampled outcome on new target.
+Output a list of {K, N, C}, where K = number of clusters, N = #of targets in each cluster, C = cluster assignment.
 }
 \usage{
 Initial_beta(dat, a, b, alpha = 2)
@@ -14,16 +13,16 @@ Initial_beta(dat, a, b, alpha = 2)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{dat}{
-%%     ~~Describe \code{dat} here~~
+  The original interaction data x0
 }
   \item{a}{
-%%     ~~Describe \code{a} here~~
+  Beta prior hyperparameters alpha0 
 }
   \item{b}{
-%%     ~~Describe \code{b} here~~
+  Beta prior hyperparameters beta0
 }
   \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+  Chinese restaurant process prior mass m0.
 }
 }
 \details{
@@ -52,36 +51,16 @@ Initial_beta(dat, a, b, alpha = 2)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (dat, a, b, alpha = 2) 
-{
-    n = dim(dat)[1]
-    m = dim(dat)[2]
-    N = rep(0, 2 * n)
-    C = rep(0, n)
-    K = 1
-    N[1] = 1
-    C[1] = 1
-    for (i in 2:n) {
-        p = rep(0, K + 1)
-        p[K + 1] = alpha/(i - 1 + alpha)
-        p[1:K] = sapply(1:K, function(x) {
-            return(N[x]/(i - 1 + alpha))
-        })
-        class = which(rmultinom(1, 1, p) == 1)
-        C[i] = class
-        N[class] = N[class] + 1
-        if (class == K + 1) {
-            K = K + 1
-        }
-    }
-    cl = list(K = K, N = N, C = C)
-    return(cl)
-  }
+data(pkis1)
+## Use 2sd criteria to create binary matrix
+dat <- t(apply(pkis1, 1, function(x){
+  thres = mean(x) + 2 * sd(x)
+  return(as.numeric(x>thres))
+}))
+rm(pkis1)
+a = rep(mean(dat),ncol(dat))
+b = 1-a
+cl = Initial_beta(dat,a,b,10)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

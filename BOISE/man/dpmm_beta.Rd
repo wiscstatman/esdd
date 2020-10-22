@@ -5,8 +5,7 @@
   function to do MCMC sampling for conjugate prior (Beta-binomial) clustering assignments
 }
 \description{
-Input: prior vector a,b, data matrix x0, warm-up step length warm, sample size iter, gap between two samples step, divergence alpha.
-Output: A list cl_sample, including clustering assignments of size "iter * Start"
+Output: A list cl_sample, including clustering assignments of size "iter"
 }
 \usage{
 dpmm_beta(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2)
@@ -14,36 +13,32 @@ dpmm_beta(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{a}{
-%%     ~~Describe \code{a} here~~
+  Prior hyperparameters alpha0
 }
   \item{b}{
-%%     ~~Describe \code{b} here~~
+  Prior hypereparameters beta0
 }
   \item{x0}{
-%%     ~~Describe \code{x0} here~~
+  Original interaction data x0
 }
   \item{warm}{
-%%     ~~Describe \code{warm} here~~
+  Burn-in parameter. How many samples are dropped in the beginning.
 }
   \item{iter}{
-%%     ~~Describe \code{iter} here~~
+  Sample size of DPMM
 }
   \item{step}{
-%%     ~~Describe \code{step} here~~
+  Thinning parameters. Gap between consecutive samples.
 }
   \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+  Chinese restaurant prior mass m0.
 }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+cl_sample, is a list of clustering assignment samples. cl_sample = {KK, NN, CC}, where KK is an array  of size "iter" with each element as the number of clusters; NN is a "iter" * "row(x0)" matrix with each row as the cluster assignment of the targets; CC is summary of every cluster in each assignment. 
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -61,35 +56,15 @@ dpmm_beta(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2) 
-{
-    n = dim(x0)[1]
-    m = dim(x0)[2]
-    KK = rep(0, iter)
-    NN = matrix(0, iter, 2 * n)
-    CC = matrix(0, iter, n)
-    cl = Initial_beta(x0, a, b, alpha)
-    for (i in 1:warm) {
-        cl = Update_beta(cl, dat = x0, a, b, alpha)
-    }
-    for (i in 1:iter) {
-        tmp = 0
-        while (tmp < step) {
-            cl = Update_beta(cl, dat = x0, a, b, alpha)
-            tmp = tmp + 1
-        }
-        KK[i] = cl$K
-        NN[i, ] = cl$N
-        CC[i, ] = cl$C
-    }
-    cl_sample = list(KK = KK, NN = NN, CC = CC)
-    return(cl_sample)
-  }
+data(pkis1)
+## Use 2sd criteria to create binary matrix
+dat <- t(apply(pkis1, 1, function(x){
+  thres = mean(x) + 2 * sd(x)
+  return(as.numeric(x>thres))
+}))
+a = rep(mean(dat,na.rm = T),ncol(dat))
+b = 1-a
+cl_sample = dpmm_beta(a,b,x0 = dat, warm=500, iter=10, step=10, alpha=15)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

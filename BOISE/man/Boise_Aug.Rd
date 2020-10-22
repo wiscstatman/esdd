@@ -5,11 +5,9 @@
   function to augment an existing informer set, usually used in parallel computing.
 }
 \description{
-Pre-step: Sample DPMM samples of cl_sample. 
-          A previous selected smaller informer set inform.
-Input: list cl_sample, corresponding parameters a,b,iter,size,alpha; nT; x0;
-Pre-selected informer set inform, number of informers to add nAdd
-Output: Informer set A with size n+nAdd (via advanced adaptive selection)
+Prerequisite is to sample DPMM samples with dpmm_beta.R to get cl_sample object. This function will take the
+input of an old informer set and other corresponding parameters to give a 
+larger BOISE informer set with size augmented by "nAdd".
 }
 \usage{
 Boise_Aug(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd)
@@ -17,45 +15,41 @@ Boise_Aug(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl_sample}{
-A list of {K, N, C}. K = number of clusters, N = #of targets in each cluster
+A list of {K, N, C} comes from dpmm_beta.R
 }
   \item{iter}{
-%%     ~~Describe \code{iter} here~~
+Sample size of DPMM clustering
 }
   \item{size}{
-%%     ~~Describe \code{size} here~~
+Sample size of possible intermediate outcomes xA
 }
   \item{nT}{
-%%     ~~Describe \code{nT} here~~
+Length of top set, used to define loss function in BOISE.
 }
   \item{a}{
-%%     ~~Describe \code{a} here~~
+Prior hyperparameters alpha0
 }
   \item{b}{
-%%     ~~Describe \code{b} here~~
+Prior hyperparameters beta0
 }
   \item{x0}{
-%%     ~~Describe \code{x0} here~~
+Original interaction data.
 }
   \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+Chinese restaurant prior mass m0
 }
   \item{inform}{
-%%     ~~Describe \code{inform} here~~
+An old informer set with smaller size.
 }
   \item{nAdd}{
-%%     ~~Describe \code{nAdd} here~~
+Number of new informers to add into original informer set.
 }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+An augmented informer set with size increased by "nAdd"
 }
 \references{
 %% ~put references to the literature/web site here ~
@@ -64,7 +58,7 @@ A list of {K, N, C}. K = number of clusters, N = #of targets in each cluster
 %%  ~~who you are~~
 }
 \note{
-%%  ~~further notes~~
+When original informer set size is large, say >=10, we recommend to choose nAdd = 1 or 2 at each time, otherwise may take really long time. We highly recommeend use parallel computing to select large informer sets. 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -73,58 +67,19 @@ A list of {K, N, C}. K = number of clusters, N = #of targets in each cluster
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cl_sample, iter, size, nT, a, b, x0, alpha, inform, 
-    nAdd) 
-{
-    if (!require("parallel")) {
-        stop("The package parallel was not installed")
-    }
-    P = clust_sum(cl_sample, x0, iter, a, b)
-    n = nrow(x0)
-    m = ncol(x0)
-    cl = cl_sample
-    cl$XX = rep(0, iter * size * m)
-    dim(cl$XX) = c(iter, size, m)
-    for (j in 1:iter) {
-        K = cl$KK[j]
-        p = rep(0, K + 1)
-        p[K + 1] = alpha/(n + alpha)
-        p[1:K] = P[[j]][, m + 1]/(n + alpha)
-        cl$XX[j, , ] = t(as.matrix(sapply(1:size, function(s) {
-            classi = which(rmultinom(1, 1, p) == 1)
-            if (classi == K + 1) {
-                post_theta = a/(a + b)
-            }
-            else {
-                post_theta = P[[j]][classi, 1:m]
-            }
-            new_xi = sapply(1:m, function(x) {
-                return(as.numeric(rbinom(1, 1, p = post_theta[x])))
-            })
-            return(new_xi)
-        })))
-    }
-    step = 1
-    n = length(inform)
-    candidate = (1:dim(x0)[2])[-inform]
-    while (step <= nAdd) {
-        pel = rep(0, length(candidate))
-        pel = unlist(mclapply(candidate, function(x) {
-            return(pel1_beta(cl, P, iter, size, A = c(inform, 
-                x), nA = n + step, nT, a, b, x0, alpha))
-        }, mc.cores = detectCores()))
-        tmp = candidate[order(pel)[1]]
-        inform = c(inform, tmp)
-        step = step + 1
-        candidate = candidate[-which(candidate == tmp)]
-    }
-    return(inform)
-  }
+#suppose you have the dat and cl_sample as in dpmm_beta
+data(pkis1)
+dat <- t(apply(pkis1, 1, function(x){
+  thres = mean(x) + 2 * sd(x)
+  return(as.numeric(x>thres))
+}))
+a = rep(mean(dat,na.rm = T),ncol(dat))
+b = 1-a
+cl_sample = dpmm_beta(a,b,x0 = dat, warm=500, iter=10, step=10, alpha=15)
+size = 1000
+A = Boise(cl_sample, iter = 10, size = 1000, nA = 2, nT = 10, a, b, x0 = dat, alpha = 15)
+A_new = Boise_Aug(cl_sample,iter = 10, size = 2000,nT = 10,a,b,x0 = dat,alpha = 15, 
+                    A, nAdd = 1)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

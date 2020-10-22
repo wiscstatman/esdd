@@ -14,38 +14,38 @@ Evaluate(cl_sample, inform, measure, test, train, nT, iter, a, b, alpha)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl_sample}{
-%%     ~~Describe \code{cl_sample} here~~
+A list of clustering assignments. cl_sample = {KK, NN, CC}.
 }
   \item{inform}{
-%%     ~~Describe \code{inform} here~~
+Selected informer set
 }
   \item{measure}{
-%%     ~~Describe \code{measure} here~~
+Measurement methods. mesure = c("nef", "rocauc", "mat", "f")
 }
   \item{test}{
-%%     ~~Describe \code{test} here~~
+True interaction on new target i*. Should be a vector/array
 }
   \item{train}{
-%%     ~~Describe \code{train} here~~
+Equivalent to original interaction data x0.
 }
   \item{nT}{
-%%     ~~Describe \code{nT} here~~
+Length of top set, used to define loss function in BOISE.
 }
   \item{iter}{
-%%     ~~Describe \code{iter} here~~
+Sample size of DPMM clustering
 }
   \item{a}{
-%%     ~~Describe \code{a} here~~
+Prior hyperparameters alpha0
 }
   \item{b}{
-%%     ~~Describe \code{b} here~~
+Prior hyperparameters beta0
 }
   \item{alpha}{
-%%     ~~Describe \code{alpha} here~~
+Chinese restaurant prior mass m0
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+"nef": NEF10 metric; "rocauc": ROCAUC; "mat":MCC; "f": F1 score.
 }
 \value{
 %%  ~Describe the value returned
@@ -70,57 +70,17 @@ Evaluate(cl_sample, inform, measure, test, train, nT, iter, a, b, alpha)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cl_sample, inform, measure, test, train, nT, iter, 
-    a, b, alpha) 
-{
-    P = clust_sum(cl_sample, train, iter, a, b)
-    Score = rep(0, ncol(train))
-    xA = test[inform]
-    nA = length(inform)
-    m = ncol(train)
-    post_probs = matrix(0, 1, iter)
-    post_thetas = matrix(0, iter, m)
-    for (k in 1:iter) {
-        postls = pel2_beta(P[[k]], x0 = train, xA, nA, A = inform, 
-            nT = 36, a, b, alpha = 15)
-        post_probs[k] = postls$post_prob
-        post_thetas[k, ] = postls$post_theta
-    }
-    post_probs = post_probs/(sum(post_probs))
-    Score = post_probs \%*\% post_thetas
-    Score[inform[which(xA == 1)]] = rep(max(Score) + 1, sum(xA))
-    Score[inform[which(xA == 0)]] = rep(min(Score) - 1, nA - 
-        sum(xA))
-    test = as.vector(test)
-    Score = as.vector(Score)
-    if (measure == "nef") {
-        top = order(Score, decreasing = T)[1:nT]
-        pred_hit = sum(test[top])
-        hit = sum(test)
-        maxhit = min(hit, nT)
-        result = ((pred_hit/nT - hit/ncol(train))/(maxhit/nT - 
-            hit/ncol(train)) + 1)/2
-    }
-    else if (measure == "rocauc") {
-        rocobj = pROC::roc(test, Score)
-        result = rocobj$auc
-    }
-    else if (measure \%in\% c("mat", "f")) {
-        pred.obj = ROCR::prediction(Score, test)
-        perform.obj = ROCR::performance(pred.obj, measure)
-        result = max(unlist(perform.obj@y.values), na.rm = T)
-    }
-    else {
-        print("Criteria is not supported.")
-        result = 0
-    }
-    return(result)
-  }
+#suppose you have the dat and cl_sample as in dpmm_beta
+data(pkis1)
+dat <- t(apply(pkis1, 1, function(x){
+  thres = mean(x) + 2 * sd(x)
+  return(as.numeric(x>thres))
+}))
+a = rep(mean(dat,na.rm = T),ncol(dat))
+b = 1-a
+test = rbinom(ncol(dat), 1, 0.5)
+nef = Evaluate(cl_sample, inform = c(1,2), measure = "nef", test, train = dat, nT = 10, iter = 10,
+      a, b, alpha = 15)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
