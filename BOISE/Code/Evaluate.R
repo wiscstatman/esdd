@@ -4,15 +4,24 @@
 ##        MCMC sample size iter, priors a and b, prior mass alpha
 ## Output: Evaluated value under given criteria
 
-Evaluate <- function(P, inform, measure,
-                     test, train, nA, nT, iter, a, b ,alpha){
-  source("pel2.R")
+Evaluate <- function(cl_sample, inform, measure,
+                     test, train, nT, iter, a, b ,alpha){
+  #source("npel2.R")
+  #source("clust_sum.R")
+  P = clust_sum(cl_sample,train,iter, a, b)
   Score = rep(0, ncol(train))
   xA = test[inform]
-  for(k in 1:iter){
-    post_theta = pel2_beta(P[[k]], x0 = train, xA, nA, A = inform, nT, a, b, alpha)
-    Score = Score + post_theta
+  nA=length(inform)
+  m = ncol(train)
+  post_probs = matrix(0, 1, iter)
+  post_thetas = matrix(0, iter, m)
+  for (k in 1:iter){
+    postls = pel2_beta(P[[k]], x0=train, xA, nA, A=inform, nT=36, a, b, alpha=15)
+    post_probs[k] = postls$post_prob
+    post_thetas[k, ] = postls$post_theta
   }
+  post_probs = post_probs / (sum(post_probs))
+  Score = post_probs %*% post_thetas
   Score[inform[which(xA==1)]] = rep(max(Score) + 1, sum(xA))
   Score[inform[which(xA==0)]] = rep(min(Score) - 1, nA - sum(xA))
   test = as.vector(test)

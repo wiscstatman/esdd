@@ -89,33 +89,3 @@ Update_beta <- function(cl, dat, a, b, alpha = 2){
   
   return(new_cl)
 }
-
-
-# #Test
-# rm(list = ls())
-# GDSC = read.csv("GDSC.csv")
-# rownames(GDSC) = GDSC$X
-# GDSC$X = NULL
-# GDSC = apply(GDSC, 2, function(x){
-#   return(1*(x<=-2))
-# })
-# 
-# missing = apply(GDSC,1, function(x){
-#   return(sum(is.na(x)))
-# })
-# test.index = which(missing == 0)
-# test = GDSC[test.index,]
-# train = GDSC[-test.index,]
-# rm(GDSC)
-# source("Initial_beta.R")
-# a = rep(mean(train,na.rm = T),ncol(train))
-# b = 1-a
-# alpha = 10
-# cl = Initial_beta(train,a,b,alpha)
-# cl = Update_beta(cl, train, a, b, alpha)
-# n = 0
-# for (i in 1:50) {
-#    cl = Update_beta(cl, train,a,b, alpha)
-#    print(cl$K)
-#    n = n + cl$K
-# }

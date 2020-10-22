@@ -35,7 +35,4 @@ dpmm_beta <- function(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2){
   cl_sample = list(KK = KK, NN = NN, CC = CC)
   return(cl_sample)
 }
-# # Test
-# system.time({
-#   cl_sample = dpmm_beta(a,b,x0 = dat, warm = 500,size = 10,iter = 100, step = 10, alpha = 15)
-# })
+
