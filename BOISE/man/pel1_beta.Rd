@@ -86,5 +86,6 @@ for (j in 1:iter) {
     cl_sample$XX[j, , ] = toy_samples
 }
 pel1 = pel1_beta(cl_sample, P,iter, size, A = c(1,2), nA=length(A), nT=10, a, b, x0 = dat, alpha = 15)
+}
 \keyword{ ~kwd1 }% use one of  RShowDoc("KEYWORDS")
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
