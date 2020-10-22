@@ -2,10 +2,11 @@
 \alias{pel1_beta}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to compute PEL-1 loss of an informer set
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: A sample of clustering assignments cl_sample, sample size iter, informer set A and nA, list P, with P[[i]] a matrix summarizing the ith cluster assginment. top size nT, prior a and b, data x0, divergence alpha
+Output: PEL1 of A
 }
 \usage{
 pel1_beta(cl_sample, P, iter, size, A, nA, nT = 10, a, b, x0, alpha = 2)

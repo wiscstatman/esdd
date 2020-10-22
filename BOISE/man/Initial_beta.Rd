@@ -2,10 +2,11 @@
 \alias{Initial_beta}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  intermediate function to initial Chinese Restaurant Process for conjugate prior DPMM
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: number of targets to be clustered n, divergency parameter alpha
+Output: A list of {K, N, C,xi}. K = number of clusters, N = #of targets in each cluster, C = cluster assignment (including new target), x_i* = sampled outcome on new target.
 }
 \usage{
 Initial_beta(dat, a, b, alpha = 2)

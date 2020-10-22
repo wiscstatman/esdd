@@ -2,10 +2,12 @@
 \alias{Boise}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to BOISE informer set selection, corresponding to Algorithm 2 in the paper
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Pre-step: Sample DPMM samples with dpmm_beta.R to get cl_sample object
+Input: list cl_sample, corresponding parameters a,b,iter,size,alpha; nA, nT; x0
+Output: Informer set A with size nA (via advanced adaptive selection)
 }
 \usage{
 Boise(cl_sample, iter, size, nA, nT, a, b, x0, alpha)

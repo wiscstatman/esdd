@@ -2,10 +2,14 @@
 \alias{Boise_Aug}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to augment an existing informer set, usually used in parallel computing.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Pre-step: Sample DPMM samples of cl_sample. 
+          A previous selected smaller informer set inform.
+Input: list cl_sample, corresponding parameters a,b,iter,size,alpha; nT; x0;
+Pre-selected informer set inform, number of informers to add nAdd
+Output: Informer set A with size n+nAdd (via advanced adaptive selection)
 }
 \usage{
 Boise_Aug(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd)
@@ -13,7 +17,7 @@ Boise_Aug(cl_sample, iter, size, nT, a, b, x0, alpha, inform, nAdd)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl_sample}{
-%%     ~~Describe \code{cl_sample} here~~
+A list of {K, N, C}. K = number of clusters, N = #of targets in each cluster
 }
   \item{iter}{
 %%     ~~Describe \code{iter} here~~

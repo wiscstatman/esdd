@@ -2,10 +2,14 @@
 \alias{pel2_beta}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to calculate PEL-2 loss based on intermediate data xA
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: Matrix P summarize the cluster assignment information (For computation)
+        Informer set A, Data matrix x0, Intermediate data xA, 
+        Informer size nA, Top size nT, 
+        prior a,b, divergence alpha
+Output: PEL2 value (given x0,xA,Cl) [posterior expected theta E(theta|C,x0,xA)]
 }
 \usage{
 pel2_beta(P, x0, xA, nA, A, nT = 10, a, b, alpha)

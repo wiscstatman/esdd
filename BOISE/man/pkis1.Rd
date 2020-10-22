@@ -2,10 +2,10 @@
 \alias{pkis1}
 \docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
+  PKIS1 data
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+ 224 targets and 366 compounds. Complete non-binarized data.
 }
 \usage{data("pkis1")}
 \format{

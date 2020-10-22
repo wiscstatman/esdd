@@ -2,10 +2,11 @@
 \alias{Update_beta}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  Dirichlet process updating for one iteration (based on Neal's 2000 Paper, Algorithm 3)
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: prior vectors a, b, divergence alpha, data, old cl list of {K, N, C}
+Output a new cl list {K, N, C}
 }
 \usage{
 Update_beta(cl, dat, a, b, alpha = 2)

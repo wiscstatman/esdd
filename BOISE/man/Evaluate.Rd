@@ -2,10 +2,11 @@
 \alias{Evaluate}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to evaluate selected informer set given the DPMM sampling.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: DPMM cluster sampling "cl_sample", informer set "inform", measurement criteria "measure", test set, train set, nA, nT, MCMC sample size iter, priors a and b, prior mass alpha
+Output: Evaluated value under given criteria
 }
 \usage{
 Evaluate(cl_sample, inform, measure, test, train, nT, iter, a, b, alpha)

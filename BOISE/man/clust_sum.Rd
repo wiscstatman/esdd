@@ -2,10 +2,10 @@
 \alias{clust_sum}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  An intermediate function that summarizes the cl_sample to P.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  P is a list of matrices, with P[[i]] a matrix contain all information of ith cluster assignment. P[[i]] is K by (n+1) matrix. Each row for one cluster, last column as number of targets in the cluster.
 }
 \usage{
 clust_sum(cl_sample, dat, iter, a, b)

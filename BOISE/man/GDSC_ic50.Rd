@@ -2,10 +2,10 @@
 \alias{GDSC_ic50}
 \docType{data}
 \title{
-%%   ~~ data name/kind ... ~~
+  GDSC cleaned data.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of the dataset. ~~
+281 cancer cell lines, 207 anti-cancer drugs. Complete but not binarized data. 
 }
 \usage{data("GDSC_ic50")}
 \format{

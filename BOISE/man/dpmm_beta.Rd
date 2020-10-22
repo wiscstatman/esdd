@@ -2,10 +2,11 @@
 \alias{dpmm_beta}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+  function to do MCMC sampling for conjugate prior (Beta-binomial) clustering assignments
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Input: prior vector a,b, data matrix x0, warm-up step length warm, sample size iter, gap between two samples step, divergence alpha.
+Output: A list cl_sample, including clustering assignments of size "iter * Start"
 }
 \usage{
 dpmm_beta(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2)
