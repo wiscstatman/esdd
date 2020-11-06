@@ -22,7 +22,7 @@
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 }
 \references{
-Yang, W., Soares, J., Greninger, P. et al. (2013) Genomics of Drug Sensitivity in Cancer (GDSC): a resource for therapeutic biomarker discovery in cancer cells. {\em Nucleic Acids Research}, vol. 41, pp. 955-961. 
+Yang, W., Soares, J., Greninger, P. et al. (2013) Genomics of Drug Sensitivity in Cancer (GDSC): a resource for therapeutic biomarker discovery in cancer cells. Nucleic Acids Research, vol. 41, pp. 955-961. 
 }
 \examples{
 data(GDSC_ic50)
