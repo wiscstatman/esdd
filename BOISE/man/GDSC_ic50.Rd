@@ -2,7 +2,7 @@
 \alias{GDSC_ic50}
 \docType{data}
 \title{
-  GDSC cleaned data.
+  A complete version of Genomics of Drug Sensitivity in Cancer (GDSC) data. 
 }
 \description{
 281 cancer cell lines, 207 anti-cancer drugs. Complete but not binarized data. 
@@ -22,7 +22,7 @@
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+Yang, W., Soares, J., Greninger, P. et al. (2013) Genomics of Drug Sensitivity in Cancer (GDSC): a resource for therapeutic biomarker discovery in cancer cells. {\em Nucleic Acids Research}, vol. 41, pp. 955-961. 
 }
 \examples{
 data(GDSC_ic50)

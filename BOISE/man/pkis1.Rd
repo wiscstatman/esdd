@@ -2,7 +2,7 @@
 \alias{pkis1}
 \docType{data}
 \title{
-  PKIS1 data
+  PKIS1 data: GSK Published Kinase Inhibitor Set, a chemogenomic data of inhibition rates between human kinases and inhibitors.
 }
 \description{
  224 targets and 366 compounds. Complete non-binarized data.
@@ -22,7 +22,7 @@
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+H Drewry, D., M Willson, T., & J Zuercher, W. (2014). Seeding collaborations to advance kinase science with the GSK Published Kinase Inhibitor Set (PKIS). Current topics in medicinal chemistry, 14(3), 340-342.
 }
 \examples{
 data(pkis1)

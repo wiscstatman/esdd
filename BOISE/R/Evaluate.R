@@ -3,6 +3,14 @@ function(cl_sample, inform, measure,
                      test, train, nT, iter, a, b ,alpha){
   #source("npel2.R")
   #source("clust_sum.R")
+  if (!require('pROC')) {
+    install.packages("pROC")
+    library(pROC)
+  }
+  if (!require('ROCR')) {
+    install.packages("ROCR")
+    library(ROCR)
+  }
   P = clust_sum(cl_sample,train,iter, a, b)
   Score = rep(0, ncol(train))
   xA = test[inform]

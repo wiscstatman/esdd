@@ -3,7 +3,8 @@ function(cl_sample, iter, size, nA, nT, a, b, x0, alpha){
   #source("clust_sum.R")
   #source("npel1.R")
   if (!require('parallel')) {
-    stop('The package parallel was not installed')
+    install.packages("parallel")
+    library(parallel)
   }
   P = clust_sum(cl_sample,x0,iter, a, b)
   n = nrow(x0)
