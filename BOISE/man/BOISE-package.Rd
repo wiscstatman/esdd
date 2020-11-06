@@ -13,7 +13,7 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{BOISE}
 \packageIndices{BOISE}
-~~ An overview of how to use the package, including the most important functions ~~
+
 }
 \author{
 \packageAuthor{BOISE}
@@ -21,13 +21,12 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{BOISE}
 }
 \references{
-~~ Literature or other references for background information ~~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. Technical Report.
 }
 
 \keyword{ package }
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 library(BOISE)
