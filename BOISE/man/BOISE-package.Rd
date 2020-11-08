@@ -21,7 +21,7 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{BOISE}
 }
 \references{
-Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. Technical Report.
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 
 \keyword{ package }

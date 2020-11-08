@@ -2,12 +2,12 @@
 \alias{Boise}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-  function to BOISE informer set selection, corresponding to Algorithm 2 in the paper
+  function to identify a Bayes optimal informer set (corresponding to Algorithm 2 in Yu et al.)
 }
 \description{
-Prerequisite is to sample DPMM samples with dpmm_beta.R to get cl_sample object. This function will take the
-input of cl_sample and other corresponding parameters to give a 
-Bayes optimal informer set A with size nA.
+Input includes a binary matrix of bioactivity data, Dirichlet-process-mixture-model samples  of
+clustering over targes (with dpmm_beta.R to get cl_sample object). This function 
+computes and minimizes posterior expected loss and returns an informer set A of size nA compounds.
 }
 \usage{
 Boise(cl_sample, iter, size, nA, nT, a, b, x0, alpha)
@@ -15,7 +15,7 @@ Boise(cl_sample, iter, size, nA, nT, a, b, x0, alpha)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl_sample}{
-A list of clustering assignments. cl_sample = {KK, NN, CC}.
+Posterior sampling of clusterings: A list of clustering assignments. cl_sample = {KK, NN, CC}.
 }
   \item{iter}{
 Sample size of DPMM clustering
@@ -49,7 +49,7 @@ Chinese restaurant prior mass m0
 Bayes optimal informer set A with size nA.
 }
 \references{
-%% ~put references to the literature/web site here ~
+
 }
 \author{
 %%  ~~who you are~~
