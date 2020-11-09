@@ -43,25 +43,24 @@ Chinese restaurant prior mass m0
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+x0 is the original data used throughout the process. a, b, alpha and iter are the same parameters for \code{dpmm_beta}. size is a new parameter for sample size of possible outcomes on the new target.  
 }
 \value{
 Bayes optimal informer set A with size nA.
 }
 \references{
-
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michael A. Newton
 }
 \note{
   Please test the function for small nA. When nA >= 8 we recommend using Boise_Aug to augment informer set step by step, otherwise it may take days to complete the selection. 
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 #suppose you have the dat and cl_sample as in dpmm_beta

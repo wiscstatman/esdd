@@ -35,25 +35,25 @@ dpmm_beta(a, b, x0, warm = 200, iter = 10, step = 5, alpha = 2)
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Typically, we choose hyperparameters a and b with the mean of actives/inactives in the data set. We choose alpha with several tests that aim to minimize the gap of cluster numbers between Chinese restaurant process prior and posterior. 
 }
 \value{
 cl_sample, is a list of clustering assignment samples. cl_sample = {KK, NN, CC}, where KK is an array  of size "iter" with each element as the number of clusters; NN is a "iter" * "row(x0)" matrix with each row as the cluster assignment of the targets; CC is summary of every cluster in each assignment. 
 }
 \references{
-%% ~put references to the literature/web site here ~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michael A. Newton
 }
 \note{
-%%  ~~further notes~~
+It may take hours for sampling, please try small sample size and burn-in/thinning step first. Only works for binary data.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 data(pkis1)

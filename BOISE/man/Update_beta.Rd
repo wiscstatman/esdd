@@ -29,29 +29,24 @@ Update_beta(cl, dat, a, b, alpha = 2)
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+a, b and alpha are hyperparameters determined by user. dat is the original data used throughout the process. 
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+An updated clustering assignment list cl = {K, N, C}, where K is the number of clusters, N is number of targets in each cluster, and C is the assignment of each target.
 }
 \references{
-%% ~put references to the literature/web site here ~
-}
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.}
 \author{
-%%  ~~who you are~~
+Peng Yu, Michael A. Newton
 }
 \note{
-%%  ~~further notes~~
+This is an internal function for \code{dpmm_beta}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 data(pkis1)

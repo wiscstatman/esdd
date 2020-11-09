@@ -16,13 +16,14 @@
   ..$ : chr [1:207] "BMS-536924" "GSK269962A" "Doxorubicin" "Etoposide" ...
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+A data matrix consists of interaction between cancer cell lines and anti-cancer drugs
 }
 \source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
+Yang, W., Soares, J., Greninger, P. et al. (2013) Genomics of Drug Sensitivity in Cancer (GDSC): a resource for therapeutic biomarker discovery in cancer cells. Nucleic Acids Research, vol. 41, pp. 955-961. 
 }
 \references{
-Yang, W., Soares, J., Greninger, P. et al. (2013) Genomics of Drug Sensitivity in Cancer (GDSC): a resource for therapeutic biomarker discovery in cancer cells. Nucleic Acids Research, vol. 41, pp. 955-961. 
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
+
 }
 \examples{
 data(GDSC_ic50)

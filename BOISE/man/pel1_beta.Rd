@@ -48,29 +48,25 @@ Chinese restaurant prior mass m0
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+a, b, alpha should keep the same as in \code{dpmm_beta}. nT is the top set size that defines loss function. P should come from function \code{clust_sum}. 
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Out put is the posterior expected loss (PEL1) of certain informer set A. Defined in BOISE paper.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michael A. Newton
 }
 \note{
-%%  ~~further notes~~
+This is an internal function used in function \code{Boise}
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 #suppose you have the dat and cl_sample as in dpmm_beta

@@ -46,16 +46,16 @@ Number of new informers to add into original informer set.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Parameters should be the same as in \code{Boise}. nAdd is the number of new informers added in this process.
 }
 \value{
 An augmented informer set with size increased by "nAdd"
 }
 \references{
-%% ~put references to the literature/web site here ~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michale A. Newton
 }
 \note{
 When original informer set size is large, say >=10, we recommend to choose nAdd = 1 or 2 at each time, otherwise may take really long time. We highly recommeend use parallel computing to select large informer sets. 
@@ -64,7 +64,7 @@ When original informer set size is large, say >=10, we recommend to choose nAdd 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 #suppose you have the dat and cl_sample as in dpmm_beta

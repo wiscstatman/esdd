@@ -45,25 +45,25 @@ pel2_beta(P, x0, xA, nA, A, nT = 10, a, b, alpha)
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Here P is not the list of matrices returned by function \code{clust_sum}. It stands for one such matrix in the list.
 }
 \value{
   PEL2 value (given x0,xA,Cl) [posterior expected theta E(theta|C,x0,xA)]
 }
 \references{
-%% ~put references to the literature/web site here ~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michale A. Newton
 }
 \note{
-%%  ~~further notes~~
+This is an internal function used in function \code{pel1_beta}, also for function \code{Boise}.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 #suppose you have the dat and cl_sample as in dpmm_beta

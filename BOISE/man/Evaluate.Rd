@@ -48,26 +48,22 @@ Chinese restaurant prior mass m0
 "nef": NEF10 metric; "rocauc": ROCAUC; "mat":MCC; "f": F1 score.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+Evaluated ranking performance under given criteria for given informer set. The ranking is based on posterior expectation, as described in BOISE paper.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Yu, P., Ericksen, S.S., Gitter, A. and Newton, M.A. (2020) \emph{Bayes Optimal Informer Sets for Drug Discovery}. University of Wisconsin, Technical Report, 2020.
 }
 \author{
-%%  ~~who you are~~
+Peng Yu, Michael A. Newton
 }
 \note{
-%%  ~~further notes~~
+Currently nef is only for NEF10 metric.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006813}
 }
 \examples{
 #suppose you have the dat and cl_sample as in dpmm_beta
