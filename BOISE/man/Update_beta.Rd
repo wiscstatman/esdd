@@ -8,28 +8,28 @@
 Update the clustering assignment list cl = {K, N, C}
 }
 \usage{
-Update_beta(cl, dat, a, b, alpha = 2)
+Update_beta(cl, x0, alpha, beta, m0 = 2)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cl}{
   Old clustering assignment list of {K, N, C}
 }
-  \item{dat}{
-  Original interaction data x0
-}
-  \item{a}{
-  Hyperparameters alpha0
-}
-  \item{b}{
-  Hyperparameters beta0
+  \item{x0}{
+  Initial bioactivity data x0
 }
   \item{alpha}{
+  Hyperparameters alpha0
+}
+  \item{beta}{
+  Hyperparameters beta0
+}
+  \item{m0}{
   Chinese restaurant prior mass m0
 }
 }
 \details{
-a, b and alpha are hyperparameters determined by user. dat is the original data used throughout the process. 
+alpha, beta and m0 are hyperparameters determined by user. x0 is the original data used throughout the process. 
 }
 \value{
 An updated clustering assignment list cl = {K, N, C}, where K is the number of clusters, N is number of targets in each cluster, and C is the assignment of each target.
@@ -51,16 +51,16 @@ This is an internal function for \code{dpmm_beta}.
 \examples{
 data(pkis1)
 ## Use 2sd criteria to create binary matrix
-dat <- t(apply(pkis1, 1, function(x){
+x0 <- t(apply(pkis1, 1, function(x){
   thres = mean(x) + 2 * sd(x)
   return(as.numeric(x>thres))
 }))
 rm(pkis1)
-a = rep(mean(dat,na.rm = T),ncol(dat))
-b = 1-a
-alpha = 10
-cl = Initial_beta(dat,a,b,alpha)
-cl = Update_beta(cl, dat, a, b, alpha)
+alpha = rep(mean(x0,na.rm = T),ncol(x0))
+beta = 1-alpha
+m0 = 10
+cl = Initial_beta(x0,m0)
+cl = Update_beta(cl, x0, alpha, beta, m0)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

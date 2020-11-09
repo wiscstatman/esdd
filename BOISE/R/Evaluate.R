@@ -1,6 +1,6 @@
 Evaluate <-
 function(cl_sample, inform, measure,
-                     test, train, nT, iter, a, b ,alpha){
+                     test, train, nT, sample_size, alpha, beta, m0){
   #source("npel2.R")
   #source("clust_sum.R")
   if (!require('pROC')) {
@@ -11,15 +11,15 @@ function(cl_sample, inform, measure,
     install.packages("ROCR")
     library(ROCR)
   }
-  P = clust_sum(cl_sample,train,iter, a, b)
+  P = clust_sum(cl_sample,train,sample_size, alpha, beta)
   Score = rep(0, ncol(train))
   xA = test[inform]
   nA=length(inform)
   m = ncol(train)
-  post_probs = matrix(0, 1, iter)
-  post_thetas = matrix(0, iter, m)
-  for (k in 1:iter){
-    postls = pel2_beta(P[[k]], x0=train, xA, nA, A=inform, nT=36, a, b, alpha=15)
+  post_probs = matrix(0, 1, sample_size)
+  post_thetas = matrix(0, sample_size, m)
+  for (k in 1:sample_size){
+    postls = pel2_beta(P[[k]], x0=train, xA, A=inform, nT=36, alpha, beta, m0=15)
     post_probs[k] = postls$post_prob
     post_thetas[k, ] = postls$post_theta
   }
