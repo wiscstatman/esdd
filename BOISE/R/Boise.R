@@ -6,9 +6,20 @@ function(cl_sample, sample_size, interm_size, nA, nT, alpha, beta, x0, m0){
     install.packages("parallel")
     library(parallel)
   }
-  P = clust_sum(cl_sample, x0, sample_size, alpha, beta)
+  
+  ### Input check
   m = nrow(x0)
   n = ncol(x0)
+  for (i in 1:m) {
+    for (j in 1:n) {
+      if(!x0[i, j] %in% c(0,1)) stop("Invalid x0. x0 Should be binary matrix")
+    }
+  }
+  if(length(alpha) != n | length(beta) != n)  stop("Length of prior parameter should be consistent")
+  if(m0 <= 0) stop("Prior mass m0 should be greater than 0.")
+  
+  
+  P = clust_sum(cl_sample, x0, sample_size, alpha, beta)
   cl = cl_sample
   cl$XX = rep(0, sample_size * interm_size * n)
   dim(cl$XX) = c(sample_size, interm_size, n)
