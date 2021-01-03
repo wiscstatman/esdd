@@ -1,3 +1,11 @@
 import(ROCR, caTools)
 
-export(Vupmtail, em_mmm, em_mvm, enrichf, oor, oor_prob, rocauc, upmrval, upmtail)
+export(Vupmtail)
+export(em_mmm)
+export(em_mvm)
+export(enrichf)
+export(oor)
+export(oor_prob)
+export(rocauc)
+export(upmrval)
+export(upmtail)
